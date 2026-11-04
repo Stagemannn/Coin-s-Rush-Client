@@ -37,7 +37,7 @@ public final class CinematiqueClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(c -> {
 			if (current != null) current.tick();
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> stop());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(CinematiqueClient::stop)); // appelé sur le thread réseau
 	}
 
 	static void start(String json) {

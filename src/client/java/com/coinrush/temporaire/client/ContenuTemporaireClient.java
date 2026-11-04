@@ -37,7 +37,7 @@ public final class ContenuTemporaireClient implements ClientModInitializer {
 	private static LayerDefinition layer() {
 		MeshDefinition mesh = new MeshDefinition();
 		mesh.getRoot().addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-4, -8, -4, 8, 8, 8), PartPose.offset(0, 24, 0));
-		mesh.getRoot().addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 16).addBox(-2, -6, -2, 4, 4, 4), PartPose.offset(0, 8, 0));
+		mesh.getRoot().addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 16).addBox(-2, -4, -2, 4, 4, 4), PartPose.offset(0, 16, 0));
 		return LayerDefinition.create(mesh, 32, 32);
 	}
 
