@@ -7,7 +7,10 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"com.coinrush.socle.client.SocleClient"
+			"com.coinrush.socle.client.SocleClient",
+			"com.coinrush.panneau.client.PanneauClient",
+			"com.coinrush.cinematique.client.CinematiqueClient",
+			"com.coinrush.temporaire.client.ContenuTemporaireClient"
 		]
 	},
 	"depends": {
