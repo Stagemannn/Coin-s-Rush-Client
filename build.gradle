@@ -1,0 +1,71 @@
+plugins {
+	id 'fabric-loom' version "${loom_version}"
+}
+
+version = file('commun/version.txt').text.trim()
+
+base {
+	archivesName = 'CoinRush-Client'
+}
+
+// La partie commune est compilée dans le jar. Le mod serveur fait de même depuis son sous-module.
+sourceSets {
+	main.java.srcDir 'commun/src/main/java'
+	test.java.srcDir 'commun/src/test/java'
+}
+
+loom {
+	splitEnvironmentSourceSets()
+
+	mods {
+		"coinrush" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+
+	runs {
+		client {
+			runDir = 'run/client'
+			programArgs '--quickPlayMultiplayer', "localhost:${project.findProperty('coinrush.port') ?: '25568'}".toString()
+		}
+		remove server
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+}
+
+processResources {
+	def version = project.version
+	inputs.property "version", version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+	it.options.encoding = 'UTF-8'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+remapJar {
+	archiveFileName = 'CoinRush-Client.jar'
+}
+
+test {
+	useJUnitPlatform()
+}

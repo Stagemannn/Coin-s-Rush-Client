@@ -1,0 +1,6 @@
+# gradlew et les scripts shell tournent sous Linux : toujours LF
+/gradlew        text eol=lf
+*.sh            text eol=lf
+
+# Scripts Windows
+*.bat           text eol=crlf
