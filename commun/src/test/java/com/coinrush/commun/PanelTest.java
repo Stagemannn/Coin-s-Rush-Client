@@ -36,6 +36,8 @@ class PanelTest {
 		refuse(new Entry(Kind.QUETE, "x".repeat(Panel.MAX_TITLE + 1), null, null, null));
 		refuse(new Entry(Kind.QUETE, "a", "x".repeat(Panel.MAX_DETAIL + 1), null, null));
 		refuse(new Entry(Kind.QUETE, "a\tb", null, null, null));
+		refuse(new Entry(Kind.QUETE, "a", null, null, null, "x".repeat(Panel.MAX_LABEL + 1), false, null));
+		refuse(new Entry(Kind.QUETE, "a", null, null, null, null, false, "x".repeat(Panel.MAX_DESCRIPTION + 1)));
 		refuse(new Entry(Kind.QUETE, "a", null, 101, null));
 		refuse(new Entry(Kind.QUETE, "a", null, -1, null));
 		refuse(new Entry(Kind.QUETE, "a", null, null, -1));
