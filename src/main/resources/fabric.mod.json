@@ -1,0 +1,19 @@
+{
+	"schemaVersion": 1,
+	"id": "coinrush",
+	"version": "${version}",
+	"name": "CoinRush",
+	"description": "Mod client de CoinRush.",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"com.coinrush.socle.client.SocleClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "1.21.8",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
