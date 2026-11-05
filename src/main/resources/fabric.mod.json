@@ -15,11 +15,13 @@
 			"com.coinrush.repere.client.RepereClient",
 			"com.coinrush.chapeaux.client.ChapeauxClient",
 			"com.coinrush.camera.client.CameraClient",
+			"com.coinrush.carte.client.CarteClient",
 			"com.coinrush.temporaire.client.ContenuTemporaireClient"
 		]
 	},
 	"mixins": [
-		"coinrush.mixins.json"
+		"coinrush.mixins.json",
+		"coinrush-carte.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.5",
