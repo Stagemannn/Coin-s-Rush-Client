@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"refmap": "client-CoinRush-Client-refmap.json",
+	"package": "com.coinrush.carte.client.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"ContainerScreenAccessor",
+		"InventaireMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
