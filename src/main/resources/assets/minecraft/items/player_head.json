@@ -1,0 +1,267 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "cases": [
+      {
+        "when": "cr_hat_aviator",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_aviator"
+        }
+      },
+      {
+        "when": "cr_hat_axolotl_hood",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_axolotl_hood"
+        }
+      },
+      {
+        "when": "cr_hat_bloom_crown",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_bloom_crown"
+        }
+      },
+      {
+        "when": "cr_hat_bumblebee",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_bumblebee"
+        }
+      },
+      {
+        "when": "cr_hat_bunny_beanie",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_bunny_beanie"
+        }
+      },
+      {
+        "when": "cr_hat_chef",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_chef"
+        }
+      },
+      {
+        "when": "cr_hat_corsair",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_corsair"
+        }
+      },
+      {
+        "when": "cr_hat_cozy_pom",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_cozy_pom"
+        }
+      },
+      {
+        "when": "cr_hat_dusty_cowboy",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_dusty_cowboy"
+        }
+      },
+      {
+        "when": "cr_hat_fiesta",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_fiesta"
+        }
+      },
+      {
+        "when": "cr_hat_fox_ears",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_fox_ears"
+        }
+      },
+      {
+        "when": "cr_hat_frog_bucket",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_frog_bucket"
+        }
+      },
+      {
+        "when": "cr_hat_frost_diadem",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_frost_diadem"
+        }
+      },
+      {
+        "when": "cr_hat_jellyfish",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_jellyfish"
+        }
+      },
+      {
+        "when": "cr_hat_little_dragon",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_little_dragon"
+        }
+      },
+      {
+        "when": "cr_hat_midnight_wizard",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_midnight_wizard"
+        }
+      },
+      {
+        "when": "cr_hat_miner",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_miner"
+        }
+      },
+      {
+        "when": "cr_hat_panda_cap",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_panda_cap"
+        }
+      },
+      {
+        "when": "cr_hat_parcel",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_parcel"
+        }
+      },
+      {
+        "when": "cr_hat_retro_tv",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_retro_tv"
+        }
+      },
+      {
+        "when": "cr_hat_royal_crown",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_royal_crown"
+        }
+      },
+      {
+        "when": "cr_hat_rubber_duck",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_rubber_duck"
+        }
+      },
+      {
+        "when": "cr_hat_sea_captain",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_sea_captain"
+        }
+      },
+      {
+        "when": "cr_hat_steam_topper",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_steam_topper"
+        }
+      },
+      {
+        "when": "cr_hat_straw_garden",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_straw_garden"
+        }
+      },
+      {
+        "when": "cr_hat_street_cap",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_street_cap"
+        }
+      },
+      {
+        "when": "cr_hat_sushi",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_sushi"
+        }
+      },
+      {
+        "when": "cr_hat_toadstool",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_toadstool"
+        }
+      },
+      {
+        "when": "cr_hat_trailblazer",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_trailblazer"
+        }
+      },
+      {
+        "when": "cr_hat_ufo",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_ufo"
+        }
+      },
+      {
+        "when": "cr_hat_chicken_hat",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_chicken_hat"
+        }
+      },
+      {
+        "when": "cr_hat_diving_helmet",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_diving_helmet"
+        }
+      },
+      {
+        "when": "cr_hat_flight_hat",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_flight_hat"
+        }
+      },
+      {
+        "when": "cr_hat_military_helmet",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_military_helmet"
+        }
+      },
+      {
+        "when": "cr_hat_motorcycle_helmet",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_motorcycle_helmet"
+        }
+      },
+      {
+        "when": "cr_hat_pot_hat",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_pot_hat"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:special",
+      "base": "minecraft:item/template_skull",
+      "model": {
+        "type": "minecraft:player_head"
+      }
+    }
+  }
+}

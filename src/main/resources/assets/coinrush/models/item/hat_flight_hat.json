@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/flight_hat",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.339,
+    0.377,
+    -0.174
+   ],
+   "scale": [
+    0.4789,
+    0.4789,
+    0.4789
+   ]
+  }
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/aviator",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.27,
+    -0.079,
+    -0.154
+   ],
+   "scale": [
+    0.8307,
+    0.8307,
+    0.8307
+   ]
+  }
+ }
+}

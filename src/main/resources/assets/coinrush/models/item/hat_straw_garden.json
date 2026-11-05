@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/straw_garden",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.0,
+    -1.088,
+    -0.628
+   ],
+   "scale": [
+    0.6644,
+    0.6644,
+    0.6644
+   ]
+  }
+ }
+}

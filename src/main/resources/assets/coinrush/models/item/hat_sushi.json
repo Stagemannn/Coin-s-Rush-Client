@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/sushi",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.065,
+    -2.158,
+    -1.321
+   ],
+   "scale": [
+    0.8575,
+    0.8575,
+    0.8575
+   ]
+  }
+ }
+}

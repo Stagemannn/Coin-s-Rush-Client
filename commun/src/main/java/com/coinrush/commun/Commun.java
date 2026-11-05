@@ -25,6 +25,7 @@ public final class Commun {
 		PayloadTypeRegistry.playC2S().register(CinematicSkipPayload.TYPE, CinematicSkipPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(NpcDialoguePayload.TYPE, NpcDialoguePayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(WaypointPayload.TYPE, WaypointPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(HatsPayload.TYPE, HatsPayload.CODEC);
 		ContenuTemporaire.init();
 	}
 

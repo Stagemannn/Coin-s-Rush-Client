@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/axolotl_hood",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.07,
+    -0.386,
+    -0.303
+   ],
+   "scale": [
+    0.7471,
+    0.7471,
+    0.7471
+   ]
+  }
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/pot_hat",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    0.913,
+    1.556,
+    1.952
+   ],
+   "scale": [
+    0.5163,
+    0.5163,
+    0.5163
+   ]
+  }
+ }
+}

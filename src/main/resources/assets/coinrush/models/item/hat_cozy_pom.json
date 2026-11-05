@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/cozy_pom",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.098,
+    -1.968,
+    -1.143
+   ],
+   "scale": [
+    0.867,
+    0.867,
+    0.867
+   ]
+  }
+ }
+}

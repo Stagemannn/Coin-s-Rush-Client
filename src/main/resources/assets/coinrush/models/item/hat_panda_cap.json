@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/panda_cap",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.125,
+    -1.545,
+    -1.036
+   ],
+   "scale": [
+    0.9166,
+    0.9166,
+    0.9166
+   ]
+  }
+ }
+}

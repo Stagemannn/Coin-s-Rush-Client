@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/motorcycle_helmet",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.162,
+    0.081,
+    -0.141
+   ],
+   "scale": [
+    0.4593,
+    0.4593,
+    0.4593
+   ]
+  }
+ }
+}

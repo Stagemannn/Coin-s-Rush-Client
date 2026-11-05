@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/retro_tv",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.244,
+    0.035,
+    -0.262
+   ],
+   "scale": [
+    0.6733,
+    0.6733,
+    0.6733
+   ]
+  }
+ }
+}

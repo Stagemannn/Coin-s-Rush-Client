@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/sea_captain",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.357,
+    -0.715,
+    -1.219
+   ],
+   "scale": [
+    0.8777,
+    0.8777,
+    0.8777
+   ]
+  }
+ }
+}

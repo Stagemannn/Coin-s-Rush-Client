@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/rubber_duck",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.085,
+    -2.473,
+    -1.525
+   ],
+   "scale": [
+    0.7987,
+    0.7987,
+    0.7987
+   ]
+  }
+ }
+}

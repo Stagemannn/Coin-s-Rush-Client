@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/fiesta",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.0,
+    -1.36,
+    -0.785
+   ],
+   "scale": [
+    0.5658,
+    0.5658,
+    0.5658
+   ]
+  }
+ }
+}

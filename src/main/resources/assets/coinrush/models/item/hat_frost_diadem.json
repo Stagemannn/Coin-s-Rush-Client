@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/frost_diadem",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    0.03,
+    -2.199,
+    -1.622
+   ],
+   "scale": [
+    0.8621,
+    0.8621,
+    0.8621
+   ]
+  }
+ }
+}

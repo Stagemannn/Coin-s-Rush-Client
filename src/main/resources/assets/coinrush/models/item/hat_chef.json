@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/chef",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.082,
+    -2.464,
+    -1.382
+   ],
+   "scale": [
+    0.8309,
+    0.8309,
+    0.8309
+   ]
+  }
+ }
+}

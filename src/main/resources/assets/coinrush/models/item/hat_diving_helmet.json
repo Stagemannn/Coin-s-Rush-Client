@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/diving_helmet",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.149,
+    -0.346,
+    -0.372
+   ],
+   "scale": [
+    0.4222,
+    0.4222,
+    0.4222
+   ]
+  }
+ }
+}

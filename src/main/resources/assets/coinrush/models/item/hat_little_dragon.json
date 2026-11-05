@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/little_dragon",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.383,
+    -1.518,
+    -1.319
+   ],
+   "scale": [
+    0.831,
+    0.831,
+    0.831
+   ]
+  }
+ }
+}

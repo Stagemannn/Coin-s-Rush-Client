@@ -12,9 +12,14 @@
 			"com.coinrush.cinematique.client.CinematiqueClient",
 			"com.coinrush.dialogue.client.DialogueClient",
 			"com.coinrush.repere.client.RepereClient",
+			"com.coinrush.chapeaux.client.ChapeauxClient",
+			"com.coinrush.camera.client.CameraClient",
 			"com.coinrush.temporaire.client.ContenuTemporaireClient"
 		]
 	},
+	"mixins": [
+		"coinrush.mixins.json"
+	],
 	"depends": {
 		"fabricloader": ">=0.19.5",
 		"minecraft": "1.21.8",

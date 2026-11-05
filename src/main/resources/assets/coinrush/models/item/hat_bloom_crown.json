@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/bloom_crown",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    0.009,
+    -0.595,
+    -0.333
+   ],
+   "scale": [
+    0.8799,
+    0.8799,
+    0.8799
+   ]
+  }
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/street_cap",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.749,
+    -0.511,
+    -1.632
+   ],
+   "scale": [
+    0.7991,
+    0.7991,
+    0.7991
+   ]
+  }
+ }
+}

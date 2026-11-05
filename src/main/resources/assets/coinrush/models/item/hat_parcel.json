@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/parcel",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.074,
+    0.832,
+    0.395
+   ],
+   "scale": [
+    0.8351,
+    0.8351,
+    0.8351
+   ]
+  }
+ }
+}

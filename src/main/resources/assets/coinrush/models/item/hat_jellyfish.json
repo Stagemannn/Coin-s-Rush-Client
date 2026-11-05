@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/jellyfish",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.0,
+    -0.185,
+    -0.107
+   ],
+   "scale": [
+    0.7112,
+    0.7112,
+    0.7112
+   ]
+  }
+ }
+}

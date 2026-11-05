@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/trailblazer",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.0,
+    -2.007,
+    -1.159
+   ],
+   "scale": [
+    0.7382,
+    0.7382,
+    0.7382
+   ]
+  }
+ }
+}

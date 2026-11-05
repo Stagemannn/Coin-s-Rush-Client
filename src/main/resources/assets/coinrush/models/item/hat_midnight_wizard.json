@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/midnight_wizard",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.0,
+    -2.522,
+    -1.456
+   ],
+   "scale": [
+    0.6486,
+    0.6486,
+    0.6486
+   ]
+  }
+ }
+}

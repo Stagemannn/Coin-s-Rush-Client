@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/bumblebee",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.077,
+    -1.822,
+    -1.14
+   ],
+   "scale": [
+    0.8183,
+    0.8183,
+    0.8183
+   ]
+  }
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/miner",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.275,
+    -1.311,
+    -1.075
+   ],
+   "scale": [
+    0.8364,
+    0.8364,
+    0.8364
+   ]
+  }
+ }
+}

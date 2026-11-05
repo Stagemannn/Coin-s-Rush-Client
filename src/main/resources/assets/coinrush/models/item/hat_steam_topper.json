@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/steam_topper",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.0,
+    -2.524,
+    -1.457
+   ],
+   "scale": [
+    0.7039,
+    0.7039,
+    0.7039
+   ]
+  }
+ }
+}

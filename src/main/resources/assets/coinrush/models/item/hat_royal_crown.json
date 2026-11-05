@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/royal_crown",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    0.016,
+    -1.437,
+    -0.998
+   ],
+   "scale": [
+    0.9174,
+    0.9174,
+    0.9174
+   ]
+  }
+ }
+}

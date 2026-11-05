@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/bunny_beanie",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.078,
+    -2.676,
+    -1.601
+   ],
+   "scale": [
+    0.8152,
+    0.8152,
+    0.8152
+   ]
+  }
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/toadstool",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.03,
+    -1.556,
+    -0.933
+   ],
+   "scale": [
+    0.7184,
+    0.7184,
+    0.7184
+   ]
+  }
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/corsair",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.119,
+    -1.806,
+    -1.181
+   ],
+   "scale": [
+    0.6894,
+    0.6894,
+    0.6894
+   ]
+  }
+ }
+}

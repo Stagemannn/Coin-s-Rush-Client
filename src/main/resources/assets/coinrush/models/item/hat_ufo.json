@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/ufo",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.017,
+    -1.691,
+    -0.996
+   ],
+   "scale": [
+    0.5946,
+    0.5946,
+    0.5946
+   ]
+  }
+ }
+}

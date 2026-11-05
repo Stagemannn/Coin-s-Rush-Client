@@ -1,0 +1,22 @@
+{
+ "parent": "coinrush:hat/chicken_hat",
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    -0.663,
+    -0.156,
+    -0.855
+   ],
+   "scale": [
+    0.375,
+    0.375,
+    0.375
+   ]
+  }
+ }
+}
