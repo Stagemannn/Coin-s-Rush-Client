@@ -6,12 +6,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
-/** Options de Coin Rush, ouvertes depuis l'écran des options du jeu : une entrée par sous-catégorie. */
+/** Options de Coin Rush, ouvertes depuis le menu Échap : une entrée par sous-catégorie. */
 public final class CoinRushOptionsScreen extends Screen {
 	private final Screen parent;
 
 	public CoinRushOptionsScreen(Screen parent) {
-		super(Component.literal("Coin Rush"));
+		super(Component.literal("Coin's Rush Options"));
 		this.parent = parent;
 	}
 
