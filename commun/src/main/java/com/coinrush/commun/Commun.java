@@ -27,6 +27,7 @@ public final class Commun {
 		PayloadTypeRegistry.playS2C().register(WaypointPayload.TYPE, WaypointPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(HatsPayload.TYPE, HatsPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(LocationPayload.TYPE, LocationPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(CartePayload.TYPE, CartePayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(CinematiquePayload.TYPE, CinematiquePayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(CinematiqueStopPayload.TYPE, CinematiqueStopPayload.CODEC);
 		PayloadTypeRegistry.playC2S().register(CinematiqueFiniePayload.TYPE, CinematiqueFiniePayload.CODEC);
