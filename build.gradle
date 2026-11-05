@@ -12,6 +12,7 @@ base {
 sourceSets {
 	main.java.srcDir 'commun/src/main/java'
 	test.java.srcDir 'commun/src/test/java'
+	test.java.srcDir 'src/clienttest/java' // tests des calculs purs du client
 }
 
 loom {
@@ -38,6 +39,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
+	testImplementation sourceSets.client.output
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
 }

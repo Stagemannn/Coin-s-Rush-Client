@@ -1,6 +1,7 @@
 package com.coinrush.camera.client.mixin;
 
 import com.coinrush.camera.client.CameraOptions;
+import com.coinrush.camera.client.FreeCamera;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
@@ -11,6 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /** 3e personne vue de dos : décalage latéral réglé dans les options (positif = caméra à droite), arrêté par les blocs. */
@@ -18,6 +20,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class CameraMixin {
 	@Shadow
 	protected abstract void setPosition(double x, double y, double z);
+
+	/** Caméra libre : la vue de dos prend l'orientation de la caméra et non celle du joueur (deux appels dans setup : cas général et wagonnet). */
+	@Redirect(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F"))
+	private float coinrush$yaw(Entity entity, float partialTick) {
+		return FreeCamera.useCamera(entity) ? FreeCamera.yaw() : entity.getViewYRot(partialTick);
+	}
+
+	@Redirect(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F"))
+	private float coinrush$pitch(Entity entity, float partialTick) {
+		return FreeCamera.useCamera(entity) ? FreeCamera.pitch() : entity.getViewXRot(partialTick);
+	}
 
 	@Inject(method = "setup", at = @At("TAIL"))
 	private void coinrush$sideOffset(BlockGetter level, Entity entity, boolean detached, boolean mirror, float partialTick, CallbackInfo ci) {
