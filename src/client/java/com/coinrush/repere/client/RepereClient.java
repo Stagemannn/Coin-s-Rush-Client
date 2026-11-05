@@ -58,7 +58,7 @@ public final class RepereClient implements ClientModInitializer {
 		int tx = x + 3 + PAD;
 		if (same) {
 			double rel = Math.atan2(-dx, dz) - Math.toRadians(mc.player.getYRot()); // 0 : droit devant, positif : à droite
-			drawArrow(g, tx + ARROW / 2f, y + PAD + ARROW / 2f, (float) -rel);
+			drawArrow(g, tx + ARROW / 2f, y + PAD + ARROW / 2f, (float) rel);
 			tx += ARROW + 4;
 		}
 		int ty = y + PAD + (same ? (ARROW - font.lineHeight * 2 - 2) / 2 : 0);
