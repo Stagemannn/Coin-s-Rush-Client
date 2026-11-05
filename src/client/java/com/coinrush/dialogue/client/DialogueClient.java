@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,15 @@ public final class DialogueClient implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("coinrush");
 	private static final int ORANGE = 0xFFAA00, RED = 0xFF5555, WIDTH = 360, BUTTON_H = 20, PAD = 8;
 
+	private static double savedX, savedY;
+	private static long savedAt;
+
+	private static void remember(Minecraft mc) {
+		savedX = mc.mouseHandler.xpos();
+		savedY = mc.mouseHandler.ypos();
+		savedAt = System.currentTimeMillis();
+	}
+
 	@Override
 	public void onInitializeClient() {
 		Commun.init();
@@ -34,7 +44,12 @@ public final class DialogueClient implements ClientModInitializer {
 				LOGGER.warn("Dialogue refusé : {}", e.getMessage());
 				return;
 			}
-			Minecraft.getInstance().setScreen(new DialogueScreen(payload));
+			Minecraft mc = Minecraft.getInstance();
+			// Ouvrir un écran recentre la souris : on la remet où elle était (fenêtre qui change, ou qui se rouvre juste après un clic).
+			if (mc.screen instanceof DialogueScreen) remember(mc);
+			mc.setScreen(new DialogueScreen(payload));
+			if (System.currentTimeMillis() - savedAt < 3000) GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), savedX, savedY);
+			savedAt = 0;
 		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
 			if (client.screen instanceof DialogueScreen) client.setScreen(null);
@@ -98,6 +113,7 @@ public final class DialogueClient implements ClientModInitializer {
 
 		private void choose(String command) {
 			if (command != null && minecraft.player != null) minecraft.player.connection.sendCommand(command);
+			remember(minecraft);
 			onClose();
 		}
 

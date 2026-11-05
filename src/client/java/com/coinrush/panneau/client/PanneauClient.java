@@ -145,7 +145,8 @@ public final class PanneauClient implements ClientModInitializer {
 
 	private static List<Line> lines(Font font, int room, boolean full) {
 		List<Line> lines = new ArrayList<>();
-		lines.add(new Line(Component.literal("Coins").getVisualOrderText(), ORANGE, Coins.format(SocleClient.balance()), 0xFFFFFF, false, -1, 0, 0));
+		Component balance = Component.literal("Coin's : ").withStyle(Style.EMPTY.withColor(ORANGE)).append(Component.literal(Coins.format(SocleClient.balance())).withStyle(Style.EMPTY.withColor(0xFFFFFF)));
+		lines.add(new Line(balance.getVisualOrderText(), 0xFFFFFF, "", 0, false, -1, 0, 0));
 		String place = lieu;
 		if (!place.isEmpty()) {
 			Component c = Component.literal("Lieu : ").withStyle(Style.EMPTY.withColor(ORANGE)).append(fmt(place));
