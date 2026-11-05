@@ -97,7 +97,7 @@ public final class PanneauClient implements ClientModInitializer {
 	}
 
 	/** Texte avec codes § : chaque code est consommé et appliqué en style, jamais affiché ni coupé. */
-	static Component fmt(String s) {
+	public static Component fmt(String s) {
 		MutableComponent out = Component.empty();
 		Style style = Style.EMPTY;
 		StringBuilder run = new StringBuilder();
@@ -162,7 +162,7 @@ public final class PanneauClient implements ClientModInitializer {
 	}
 
 	/** Texte qui défile doucement dans son cadre quand il est trop long, avec une pause à chaque bout ; jamais coupé. */
-	private static void text(GuiGraphics g, Font font, FormattedCharSequence s, int x, int y, int room, int color) {
+	public static void text(GuiGraphics g, Font font, FormattedCharSequence s, int x, int y, int room, int color) {
 		int tw = font.width(s);
 		if (tw <= room) {
 			g.drawString(font, s, x, y, 0xFF000000 | color, true);
@@ -176,6 +176,11 @@ public final class PanneauClient implements ClientModInitializer {
 		g.enableScissor(x, y - 1, x + room, y + font.lineHeight + 1);
 		g.drawString(font, s, x - off, y, 0xFF000000 | color, true);
 		g.disableScissor();
+	}
+
+	/** Bas du panneau tel que dessiné (0 si non affiché), pour placer ce qui vient dessous. */
+	public static int bottom() {
+		return rw == 0 ? 0 : ry + rh;
 	}
 
 	private static void check(GuiGraphics g, int x, int y) {
