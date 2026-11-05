@@ -1,6 +1,7 @@
 package com.coinrush.panneau.client;
 
 import com.coinrush.commun.Commun;
+import com.coinrush.commun.JourPayload;
 import com.coinrush.commun.LocationPayload;
 import com.coinrush.commun.Panel;
 import com.coinrush.commun.PanelPayload;
@@ -46,6 +47,7 @@ public final class PanneauClient implements ClientModInitializer {
 	private static volatile Panel panel = Panel.EMPTY;
 	private static volatile long receivedAt;
 	private static volatile String lieu = "";
+	private static volatile String jour = "";
 	private static boolean compact, detailed;
 	/** Rectangle du panneau tel que dessiné à la dernière image (largeur 0 : rien d'affiché), pour le clic. */
 	private static int rx, ry, rw, rh;
@@ -85,9 +87,18 @@ public final class PanneauClient implements ClientModInitializer {
 				LOGGER.warn("Lieu refusé : {}", e.getMessage());
 			}
 		});
+		ClientPlayNetworking.registerGlobalReceiver(JourPayload.TYPE, (payload, context) -> {
+			try {
+				payload.validate();
+				jour = payload.texte();
+			} catch (IllegalArgumentException e) {
+				LOGGER.warn("Jour refusé : {}", e.getMessage());
+			}
+		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			panel = Panel.EMPTY;
 			lieu = "";
+			jour = "";
 		});
 		HudElementRegistry.addLast(ResourceLocation.fromNamespaceAndPath("coinrush", "panneau"), (graphics, delta) -> render(graphics));
 	}
@@ -145,6 +156,7 @@ public final class PanneauClient implements ClientModInitializer {
 
 	private static List<Line> lines(Font font, int room, boolean full) {
 		List<Line> lines = new ArrayList<>();
+		if (!jour.isEmpty()) lines.add(new Line(fmt(jour).getVisualOrderText(), ORANGE, "", 0, false, -1, 0, 0)); // tout en haut : pause ou jour et heure
 		Component balance = Component.literal("Coin's : ").withStyle(Style.EMPTY.withColor(ORANGE)).append(Component.literal(Coins.format(SocleClient.balance())).withStyle(Style.EMPTY.withColor(0xFFFFFF)));
 		lines.add(new Line(balance.getVisualOrderText(), 0xFFFFFF, "", 0, false, -1, 0, 0));
 		String place = lieu;

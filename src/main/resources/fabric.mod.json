@@ -9,6 +9,7 @@
 		"client": [
 			"com.coinrush.socle.client.SocleClient",
 			"com.coinrush.panneau.client.PanneauClient",
+			"com.coinrush.inventaire.client.InventaireClient",
 			"com.coinrush.cinematique.client.CinematiqueClient",
 			"com.coinrush.cinematique.client.LecteurClient",
 			"com.coinrush.dialogue.client.DialogueClient",
