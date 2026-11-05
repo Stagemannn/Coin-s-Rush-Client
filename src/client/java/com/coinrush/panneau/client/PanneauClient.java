@@ -1,6 +1,7 @@
 package com.coinrush.panneau.client;
 
 import com.coinrush.commun.Commun;
+import com.coinrush.commun.LocationPayload;
 import com.coinrush.commun.Panel;
 import com.coinrush.commun.PanelPayload;
 import com.coinrush.commun.Coins;
@@ -44,6 +45,7 @@ public final class PanneauClient implements ClientModInitializer {
 
 	private static volatile Panel panel = Panel.EMPTY;
 	private static volatile long receivedAt;
+	private static volatile String lieu = "";
 	private static boolean compact, detailed;
 	/** Rectangle du panneau tel que dessiné à la dernière image (largeur 0 : rien d'affiché), pour le clic. */
 	private static int rx, ry, rw, rh;
@@ -75,7 +77,18 @@ public final class PanneauClient implements ClientModInitializer {
 				LOGGER.warn("Panneau refusé : {}", e.getMessage());
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> panel = Panel.EMPTY);
+		ClientPlayNetworking.registerGlobalReceiver(LocationPayload.TYPE, (payload, context) -> {
+			try {
+				payload.validate();
+				lieu = payload.lieu();
+			} catch (IllegalArgumentException e) {
+				LOGGER.warn("Lieu refusé : {}", e.getMessage());
+			}
+		});
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			panel = Panel.EMPTY;
+			lieu = "";
+		});
 		HudElementRegistry.addLast(ResourceLocation.fromNamespaceAndPath("coinrush", "panneau"), (graphics, delta) -> render(graphics));
 	}
 
@@ -133,6 +146,11 @@ public final class PanneauClient implements ClientModInitializer {
 	private static List<Line> lines(Font font, int room, boolean full) {
 		List<Line> lines = new ArrayList<>();
 		lines.add(new Line(Component.literal("Coins").getVisualOrderText(), ORANGE, Coins.format(SocleClient.balance()), 0xFFFFFF, false, -1, 0, 0));
+		String place = lieu;
+		if (!place.isEmpty()) {
+			Component c = Component.literal("Lieu : ").withStyle(Style.EMPTY.withColor(ORANGE)).append(fmt(place));
+			lines.add(new Line(c.getVisualOrderText(), 0xFFFFFF, "", 0, false, -1, 0, 0));
+		}
 		if (compact) return lines;
 		long elapsed = (System.currentTimeMillis() - receivedAt) / 1000;
 		for (Panel.Kind kind : Panel.Kind.values()) {
