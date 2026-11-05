@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Carte en jeu : garde l'adresse du panel joueurs reçue à la connexion et ajoute le bouton « Map » à l'écran d'inventaire
- * (appelé par {@code InventaireMixin}), sous les boutons Agenda et Quêtes.
+ * (placé par InventaireClient, sous les boutons Agenda et Quêtes).
  */
 public final class CarteClient implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("coinrush");
@@ -25,12 +25,17 @@ public final class CarteClient implements ClientModInitializer {
 			try {
 				payload.validate();
 				url = payload.url().isEmpty() ? null : payload.url();
+				ProfilClient.configurer(url);
 			} catch (IllegalArgumentException e) {
 				LOGGER.warn("Adresse de la carte refusée : {}", e.getMessage());
 				url = null;
+				ProfilClient.configurer(null);
 			}
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> url = null);
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			url = null;
+			ProfilClient.configurer(null);
+		});
 	}
 
 	/** La carte est-elle joignable sur ce serveur ? */

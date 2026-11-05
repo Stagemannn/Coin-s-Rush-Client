@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Lecture du panel joueurs du serveur (lecture seule) avec le jeton personnel reçu à la connexion : position de soi et des
- * coéquipiers chaque seconde, profil toutes les 3 s, carte toutes les 5 s, tuiles à la demande. Tout se passe hors du thread
+ * coéquipiers chaque seconde, carte toutes les 5 s, tuiles à la demande. Tout se passe hors du thread
  * de rendu ; l'écran lit les champs publics. Le serveur filtre : aucune autre position que la nôtre et celle de l'équipe n'arrive jamais.
  */
 final class CarteDonnees implements AutoCloseable {
@@ -37,8 +37,6 @@ final class CarteDonnees implements AutoCloseable {
 	record Point(Component nom, int couleur, double x, double z) { }
 
 	record Equipier(UUID id, String nom, double x, double z) { }
-
-	record Profil(String pseudo, String coins, Map<String, Long> stats) { }
 
 	/** Tuile reçue : octets PNG pas encore transformés en texture (le thread de rendu s'en charge). */
 	static final class Tuile {
@@ -54,7 +52,6 @@ final class CarteDonnees implements AutoCloseable {
 	volatile List<Equipier> equipe = List.of();
 	volatile List<Boite> boites = List.of();
 	volatile List<Point> points = List.of(), pnj = List.of();
-	volatile Profil profil;
 	volatile String erreur;
 	final Map<String, Tuile> tuiles = new ConcurrentHashMap<>();
 
@@ -74,7 +71,6 @@ final class CarteDonnees implements AutoCloseable {
 		for (String p : String.valueOf(u.getRawQuery()).split("&")) if (p.startsWith("t=")) t = p.substring(2);
 		cookie = "crpj=" + t;
 		exec.scheduleWithFixedDelay(() -> tente(this::position), 0, 1, TimeUnit.SECONDS);
-		exec.scheduleWithFixedDelay(() -> tente(this::profil), 0, 3, TimeUnit.SECONDS);
 		exec.scheduleWithFixedDelay(() -> tente(this::carte), 0, 5, TimeUnit.SECONDS);
 	}
 
@@ -118,13 +114,6 @@ final class CarteDonnees implements AutoCloseable {
 			l.add(new Equipier(UUID.fromString(j.get("id").getAsString()), j.get("nom").getAsString(), j.get("x").getAsDouble(), j.get("z").getAsDouble()));
 		}
 		equipe = l;
-	}
-
-	private void profil() throws Exception {
-		JsonObject o = json("/api/profil");
-		Map<String, Long> st = new java.util.LinkedHashMap<>();
-		for (var e : o.getAsJsonObject("stats").entrySet()) st.put(e.getKey(), e.getValue().getAsLong());
-		profil = new Profil(o.get("pseudo").getAsString(), o.get("coins").getAsString(), st);
 	}
 
 	private void carte() throws Exception {

@@ -27,19 +27,17 @@ import net.minecraft.resources.ResourceLocation;
  */
 final class CarteScreen extends Screen {
 	private static final int ORANGE = 0xFFFFAA00, ROUGE = 0xFFFF7777, BLANC = 0xFFFFFFFF, GRIS = 0xFFB49A8E, FOND = 0xFF120B09;
-	private static final String[][] STATS = {{"poses", "Blocs posés"}, {"casses", "Blocs cassés"}, {"mobs", "Mobs tués"}, {"morts", "Morts"},
-			{"joueurs", "Joueurs tués"}, {"boss", "Boss tués"}, {"quetes", "Quêtes terminées"}};
 	private static int compteur;
 
 	private final Screen parent;
 	private final CarteDonnees d;
 	private double vx, vz, s = 1;
-	private boolean suivre = true, statsOuvertes, premiere = true;
+	private boolean suivre = true, premiere = true;
+	private final ProfilBox profilBox = new ProfilBox();
 	private double[] lisse;
 	private final Map<UUID, double[]> lissesEquipe = new HashMap<>();
 	private long dernierImage = System.nanoTime(), dernierePurge, derniereRevalidation;
 	private EditBox aller;
-	private int rx, ry, rw, rh; // cadre du profil tel que dessiné, pour le clic
 
 	CarteScreen(Screen parent, String url) {
 		super(Component.literal("Carte"));
@@ -102,11 +100,7 @@ final class CarteScreen extends Screen {
 	@Override
 	public boolean mouseClicked(double x, double y, int bouton) {
 		if (super.mouseClicked(x, y, bouton)) return true;
-		if (bouton == 0 && rw > 0 && x >= rx && x < rx + rw && y >= ry && y < ry + rh) {
-			statsOuvertes = !statsOuvertes;
-			return true;
-		}
-		return false;
+		return profilBox.clic(x, y, bouton);
 	}
 
 	@Override
@@ -172,7 +166,7 @@ final class CarteScreen extends Screen {
 		boites(g);
 		points(g);
 		tetes(g);
-		profil(g);
+		profilBox.render(g, font, 6, 6, false);
 		infobulle(g, mx, my);
 		int[] c = {(int) Math.floor(vx + (mx - width / 2.0) / s), (int) Math.floor(vz + (my - height / 2.0) / s)};
 		g.drawString(font, "X " + c[0] + "  Z " + c[1], width - 128 - font.width("X " + c[0] + "  Z " + c[1]) - 6, height - 19, ORANGE);
@@ -296,34 +290,8 @@ final class CarteScreen extends Screen {
 		if (nom != null) g.drawString(font, nom, x - font.width(nom) / 2, z + 11, BLANC);
 	}
 
-	private void profil(GuiGraphics g) {
-		CarteDonnees.Profil p = d.profil;
-		String pseudo = p != null ? p.pseudo() : minecraft.player != null ? minecraft.player.getGameProfile().getName() : "";
-		String coins = p != null ? p.coins() + " Coins" : "…";
-		rx = 6;
-		ry = 6;
-		rw = Math.max(110, 30 + Math.max(font.width(pseudo), font.width(coins)) + 8);
-		rh = 26 + (statsOuvertes ? 6 + 10 * STATS.length : 0);
-		g.fill(rx, ry, rx + rw, ry + rh, 0xE62A1C18);
-		g.renderOutline(rx, ry, rw, rh, 0xFF4A2F27);
-		g.fill(rx, ry, rx + rw, ry + 2, ORANGE);
-		g.fill(rx + 3, ry + 4, rx + 23, ry + 24, ORANGE);
-		if (minecraft.player != null) PlayerFaceRenderer.draw(g, minecraft.player.getSkin(), rx + 4, ry + 5, 18);
-		g.drawString(font, pseudo, rx + 28, ry + 6, BLANC);
-		g.drawString(font, coins, rx + 28, ry + 16, ORANGE);
-		if (statsOuvertes) {
-			for (int i = 0; i < STATS.length; i++) {
-				long v = p == null ? 0 : p.stats().getOrDefault(STATS[i][0], 0L);
-				int y = ry + 30 + 10 * i;
-				g.drawString(font, STATS[i][1], rx + 6, y, GRIS);
-				String val = String.valueOf(v);
-				g.drawString(font, val, rx + rw - 6 - font.width(val), y, ORANGE);
-			}
-		}
-	}
-
 	private void infobulle(GuiGraphics g, int mx, int my) {
-		if (rw > 0 && mx >= rx && mx < rx + rw && my >= ry && my < ry + rh) return;
+		if (profilBox.contient(mx, my)) return;
 		double wx = vx + (mx - width / 2.0) / s, wz = vz + (my - height / 2.0) / s, r = 7 / s;
 		Component texte = null;
 		for (CarteDonnees.Point p : d.points) if (Math.abs(p.x() - wx) < r && Math.abs(p.z() - wz) < r) texte = p.nom();
