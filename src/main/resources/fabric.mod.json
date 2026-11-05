@@ -10,6 +10,7 @@
 			"com.coinrush.socle.client.SocleClient",
 			"com.coinrush.panneau.client.PanneauClient",
 			"com.coinrush.cinematique.client.CinematiqueClient",
+			"com.coinrush.cinematique.client.LecteurClient",
 			"com.coinrush.dialogue.client.DialogueClient",
 			"com.coinrush.repere.client.RepereClient",
 			"com.coinrush.chapeaux.client.ChapeauxClient",
