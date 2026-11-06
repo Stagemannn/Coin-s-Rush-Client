@@ -14,19 +14,33 @@ class ChronoTest {
 	}
 
 	private static Evenement camera(int t, int duree, boolean lisse, Pose... poses) {
-		return new Evenement("camera", t, duree, List.of(poses), lisse, 0, 0, 0, null, 0, 0, false);
+		return new Evenement("camera", t, duree, List.of(poses), lisse, 0, 0, 0, null, 0, 0, false, null, 0, 0, 0, false, 0, 0);
 	}
 
 	private static Evenement fade(int t, int in, int hold, int out) {
-		return new Evenement("fade", t, 0, null, false, in, hold, out, null, 0, 0, false);
+		return new Evenement("fade", t, 0, null, false, in, hold, out, null, 0, 0, false, null, 0, 0, 0, false, 0, 0);
 	}
 
 	private static Evenement texte(int t, String s) {
-		return new Evenement("text", t, 0, null, false, 10, 20, 10, s, 2, 0xFFFFFF, false);
+		return new Evenement("text", t, 0, null, false, 10, 20, 10, s, 2, 0xFFFFFF, false, null, 0, 0, 0, false, 0, 0);
+	}
+
+	private static final String SHA = "a".repeat(64), SON = "b".repeat(64);
+
+	private static Evenement bandes(int t, int duree, boolean ouvrir) {
+		return new Evenement("bandes", t, duree, null, false, 0, 0, 0, null, 0, 0, false, null, 0, 0, 0, ouvrir, 0, 0);
+	}
+
+	private static Evenement image(int t, int in, int hold, int out) {
+		return new Evenement("image", t, 0, null, false, in, hold, out, null, 0, 0, false, SHA, 0.5f, 0.5f, 0.3f, false, 0, 0);
+	}
+
+	private static Evenement audio(int t) {
+		return new Evenement("audio", t, 0, null, false, 0, 0, 0, null, 0, 0, false, SON, 0, 0, 0, false, 1, 1);
 	}
 
 	private static Chrono chrono(int total, Evenement... e) {
-		CinematiquePayload p = new CinematiquePayload("a", true, total, List.of(e));
+		CinematiquePayload p = new CinematiquePayload("a", total, List.of(new CinematiquePayload.Media(SHA, "png", 10), new CinematiquePayload.Media(SON, "ogg", 10)), List.of(e));
 		p.validate();
 		return new Chrono(p);
 	}
@@ -83,7 +97,7 @@ class ChronoTest {
 	@Test
 	void cameraFollowsEventsInOrderAndCameraOffReleases() {
 		Chrono ch = chrono(300,
-				new Evenement("cameraoff", 200, 0, null, false, 0, 0, 0, null, 0, 0, false),
+				new Evenement("cameraoff", 200, 0, null, false, 0, 0, 0, null, 0, 0, false, null, 0, 0, 0, false, 0, 0),
 				camera(100, 50, false, pose(0, 0, 0, 0, 0), pose(10, 0, 0, 0, 0)), // volontairement désordonnés
 				camera(0, 0, false, pose(5, 5, 5, 0, 0)));
 		assertEquals(5, ch.camera(50).x(), 1e-9); // fixe
@@ -120,5 +134,49 @@ class ChronoTest {
 		assertEquals(0.5f, ch.texte(35).alpha(), 1e-6);
 		assertNull(ch.texte(40));
 		assertEquals("deux", ch.texte(120).texte());
+	}
+
+	@Test
+	void barsOpenAndCloseOverTheirDuration() {
+		Chrono ch = chrono(300, bandes(150, 40, false), bandes(10, 20, true)); // désordonnés
+		assertEquals(0, ch.bandes(5), 1e-6);
+		assertEquals(0.5f, ch.bandes(20), 1e-6); // à mi-ouverture
+		assertEquals(1, ch.bandes(30), 1e-6);
+		assertEquals(1, ch.bandes(149), 1e-6);
+		assertEquals(0.5f, ch.bandes(170), 1e-6); // fermeture
+		assertEquals(0, ch.bandes(190), 1e-6);
+	}
+
+	@Test
+	void aTransitionCutShortContinuesFromWhereItWas() {
+		Chrono ch = chrono(300, bandes(0, 100, true), bandes(50, 50, false)); // ouvertes à moitié (0,5) puis fermées en 50 ticks
+		assertEquals(0.5f, ch.bandes(50), 1e-6);
+		assertEquals(0.25f, ch.bandes(75), 1e-6);
+		assertEquals(0, ch.bandes(100), 1e-6);
+	}
+
+	@Test
+	void instantBars() {
+		Chrono ch = chrono(100, bandes(10, 0, true));
+		assertEquals(0, ch.bandes(9.9), 1e-6);
+		assertEquals(1, ch.bandes(10), 1e-6);
+	}
+
+	@Test
+	void imagesFadeInHoldAndOut() {
+		Chrono ch = chrono(200, image(10, 10, 20, 10), image(100, 0, 5, 0));
+		assertTrue(ch.images(5).isEmpty());
+		assertEquals(0.5f, ch.images(15).get(0).alpha(), 1e-6);
+		assertEquals(1, ch.images(25).get(0).alpha(), 1e-6);
+		assertEquals(0.5f, ch.images(45).get(0).alpha(), 1e-6);
+		assertTrue(ch.images(60).isEmpty());
+		assertEquals(SHA, ch.images(102).get(0).media());
+		assertEquals(0.3f, ch.images(102).get(0).largeur(), 1e-6);
+	}
+
+	@Test
+	void audiosAreKeptInOrder() {
+		Chrono ch = chrono(100, audio(40), audio(10));
+		assertEquals(List.of(10, 40), ch.audios().stream().map(Evenement::t).toList());
 	}
 }

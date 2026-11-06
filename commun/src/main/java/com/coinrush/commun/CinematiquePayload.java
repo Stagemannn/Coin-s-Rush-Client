@@ -17,19 +17,31 @@ import net.minecraft.resources.ResourceLocation;
  * <li>{@link #CAMERA_OFF} : la caméra revient au joueur, qui reprend la main.</li>
  * <li>{@link #FADE} : fondu au noir (entrée, noir plein, sortie).</li>
  * <li>{@link #TEXT} : texte centré (ou en bas), lignes séparées par {@code \n}, taille et couleur RVB, avec entrée/maintien/sortie en ticks.</li>
+ * <li>{@link #IMAGE} : image PNG importée ({@code media} = empreinte SHA-256 d'un fichier de {@link #medias}), centrée en ({@code x}, {@code y})
+ * (parts de l'écran), large de {@code largeur} part de l'écran, avec entrée/maintien/sortie.</li>
+ * <li>{@link #AUDIO} : son OGG importé, joué à {@code t} avec {@code volume} et {@code hauteur}, coupé à la fin.</li>
+ * <li>{@link #BANDES} : bandes noires du cinéma qui s'ouvrent ({@code actif}) ou se ferment en {@code duree} ticks.</li>
  * </ul>
- * Les bandes noires restent affichées tant que la caméra est détachée. La lecture s'arrête à {@code totalTicks}.
+ * Les images et sons importés ne sont pas dans le mod : le serveur les envoie avant la cinématique ({@link CinematiqueMediasPayload}), le client les garde en cache.
+ * La lecture s'arrête à {@code totalTicks}.
  * Transporté en JSON puis validé ({@link #validate()}) : le décodage ne lève jamais d'exception.
  */
-public record CinematiquePayload(String id, boolean bandesNoires, int totalTicks, List<Evenement> evenements) implements CustomPacketPayload {
+public record CinematiquePayload(String id, int totalTicks, List<Media> medias, List<Evenement> evenements) implements CustomPacketPayload {
 	public record Pose(double x, double y, double z, float yaw, float pitch) { }
+
+	/** Fichier importé : empreinte SHA-256 (64 caractères hexadécimaux minuscules), extension {@code png} ou {@code ogg}, taille en octets. */
+	public record Media(String sha, String ext, int taille) { }
 
 	/** Champs inutilisés par un type : valeurs neutres (0, null, false). */
 	public record Evenement(String type, int t, int duree, List<Pose> poses, boolean lisse, int entree, int maintien, int sortie,
-			String texte, float taille, int couleur, boolean bas) { }
+			String texte, float taille, int couleur, boolean bas, String media, float x, float y, float largeur, boolean actif, float volume, float hauteur) { }
 
-	public static final String CAMERA = "camera", CAMERA_OFF = "cameraoff", FADE = "fade", TEXT = "text";
+	public static final String CAMERA = "camera", CAMERA_OFF = "cameraoff", FADE = "fade", TEXT = "text", IMAGE = "image", AUDIO = "audio", BANDES = "bandes";
+	public static final String PNG = "png", OGG = "ogg";
 	public static final int MAX_ID = 64, MAX_EVENEMENTS = 256, MAX_POSES = 64, MAX_TOTAL_TICKS = 36_000, MAX_TEXTE = 256;
+	/** Fichiers d'une cinématique, octets par fichier (image / son) et au total. */
+	public static final int MAX_MEDIAS = 12, MAX_PNG = 1 << 20, MAX_OGG = 4 << 20, MAX_MEDIAS_TOTAL = 16 << 20;
+	public static final float MIN_LARGEUR = 0.02f, MAX_LARGEUR = 1f, MAX_VOLUME = 10f;
 	public static final float MIN_TAILLE = 0.5f, MAX_TAILLE = 8f;
 	private static final double MAX_COORD = 30_000_000;
 	public static final Type<CinematiquePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath("coinrush", "cinematique"));
@@ -45,7 +57,7 @@ public record CinematiquePayload(String id, boolean bandesNoires, int totalTicks
 		} catch (RuntimeException e) {
 			// refusé plus bas
 		}
-		return new CinematiquePayload(null, false, 0, null);
+		return new CinematiquePayload(null, 0, null, null);
 	}
 
 	String toJson() {
@@ -56,6 +68,7 @@ public record CinematiquePayload(String id, boolean bandesNoires, int totalTicks
 		if (!Textes.valide(id, MAX_ID)) throw new IllegalArgumentException("id invalide");
 		if (totalTicks < 1 || totalTicks > MAX_TOTAL_TICKS) throw new IllegalArgumentException("durée invalide");
 		if (evenements == null || evenements.size() > MAX_EVENEMENTS) throw new IllegalArgumentException("nombre d'événements invalide");
+		validerMedias(medias);
 		for (Evenement e : evenements) {
 			if (e == null || e.type() == null) throw new IllegalArgumentException("événement absent");
 			if (e.t() < 0 || e.t() > totalTicks) throw new IllegalArgumentException("date invalide");
@@ -64,9 +77,44 @@ public record CinematiquePayload(String id, boolean bandesNoires, int totalTicks
 				case CAMERA_OFF -> { }
 				case FADE -> duree(e);
 				case TEXT -> texte(e);
+				case IMAGE -> image(e, medias);
+				case AUDIO -> audio(e, medias);
+				case BANDES -> { if (e.duree() < 0 || e.duree() > MAX_TOTAL_TICKS) throw new IllegalArgumentException("durée de bandes invalide"); }
 				default -> throw new IllegalArgumentException("type inconnu");
 			}
 		}
+	}
+
+	/** Liste de fichiers valide : au plus {@link #MAX_MEDIAS}, empreintes uniques, tailles bornées. Sert aussi au client qui reçoit la liste avant la cinématique. */
+	public static void validerMedias(List<Media> medias) {
+		if (medias == null || medias.size() > MAX_MEDIAS) throw new IllegalArgumentException("nombre de fichiers invalide");
+		java.util.Set<String> vus = new java.util.HashSet<>();
+		long total = 0;
+		for (Media m : medias) {
+			if (m == null || m.sha() == null || !m.sha().matches("[0-9a-f]{64}") || !vus.add(m.sha())) throw new IllegalArgumentException("empreinte invalide");
+			int max = PNG.equals(m.ext()) ? MAX_PNG : OGG.equals(m.ext()) ? MAX_OGG : -1;
+			if (max < 0) throw new IllegalArgumentException("format de fichier inconnu");
+			if (m.taille() < 1 || m.taille() > max) throw new IllegalArgumentException("taille de fichier invalide");
+			total += m.taille();
+		}
+		if (total > MAX_MEDIAS_TOTAL) throw new IllegalArgumentException("fichiers trop lourds");
+	}
+
+	private static void media(Evenement e, List<Media> medias, String ext) {
+		if (e.media() == null || medias.stream().noneMatch(m -> m.sha().equals(e.media()) && m.ext().equals(ext))) throw new IllegalArgumentException("fichier inconnu");
+	}
+
+	private static void image(Evenement e, List<Media> medias) {
+		media(e, medias, PNG);
+		duree(e);
+		for (float v : new float[] {e.x(), e.y()}) if (!Float.isFinite(v) || v < 0 || v > 1) throw new IllegalArgumentException("position d'image invalide");
+		if (!Float.isFinite(e.largeur()) || e.largeur() < MIN_LARGEUR || e.largeur() > MAX_LARGEUR) throw new IllegalArgumentException("largeur d'image invalide");
+	}
+
+	private static void audio(Evenement e, List<Media> medias) {
+		media(e, medias, OGG);
+		if (!Float.isFinite(e.volume()) || e.volume() < 0 || e.volume() > MAX_VOLUME) throw new IllegalArgumentException("volume invalide");
+		if (!Float.isFinite(e.hauteur()) || e.hauteur() < 0.5f || e.hauteur() > 2f) throw new IllegalArgumentException("hauteur invalide");
 	}
 
 	private static void camera(Evenement e) {
