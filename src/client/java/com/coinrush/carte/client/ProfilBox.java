@@ -17,13 +17,30 @@ public final class ProfilBox {
 	private boolean ouvert;
 	private int x, y, w, h; // cadre tel que dessiné à la dernière image, pour le clic
 
+	/** Largeur minimale : assez pour les trois boutons de l'inventaire placés au-dessus. */
+	public static final int LARGEUR_MIN = 152;
+
+	private static String pseudo(ProfilClient.Profil p) {
+		Minecraft mc = Minecraft.getInstance();
+		return p != null ? p.pseudo() : mc.player != null ? mc.player.getGameProfile().getName() : "";
+	}
+
+	private static String coins(ProfilClient.Profil p) {
+		return p != null ? p.coins() + " Coins" : "…";
+	}
+
+	/** Largeur de l'encadré, connue avant de le dessiner (pour aligner les boutons de l'inventaire dessus). */
+	public static int largeur(Font font) {
+		ProfilClient.Profil p = ProfilClient.actuel();
+		return Math.max(LARGEUR_MIN, 30 + Math.max(font.width(pseudo(p)), font.width(coins(p))) + 8);
+	}
+
 	/** @param ancre bord gauche, ou bord droit si {@code aDroite} */
 	public void render(GuiGraphics g, Font font, int ancre, int top, boolean aDroite) {
 		Minecraft mc = Minecraft.getInstance();
 		ProfilClient.Profil p = ProfilClient.actuel();
-		String pseudo = p != null ? p.pseudo() : mc.player != null ? mc.player.getGameProfile().getName() : "";
-		String coins = p != null ? p.coins() + " Coins" : "…";
-		w = Math.max(110, 30 + Math.max(font.width(pseudo), font.width(coins)) + 8);
+		String pseudo = pseudo(p), coins = coins(p);
+		w = largeur(font);
 		h = 26 + (ouvert ? 6 + 10 * STATS.length : 0);
 		x = aDroite ? ancre - w : ancre;
 		y = top;
