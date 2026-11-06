@@ -10,8 +10,9 @@ import net.minecraft.resources.ResourceLocation;
 
 /** Joueurs sous /camo, reçus du serveur ({@link CamoPayload}) : leur skin devient celui de Mr le Directeur (voir PlayerSkinMixin). */
 public final class CamoClient {
+	private static final ResourceLocation CAPE = ResourceLocation.fromNamespaceAndPath("coinrush", "textures/entity/cape_directeur.png");
 	public static final PlayerSkin SKIN = new PlayerSkin(ResourceLocation.fromNamespaceAndPath("coinrush", "textures/entity/directeur.png"),
-			null, null, null, PlayerSkin.Model.WIDE, true);
+			null, CAPE, CAPE, PlayerSkin.Model.WIDE, true);
 	private static volatile Set<UUID> camo = Set.of();
 
 	private CamoClient() { }

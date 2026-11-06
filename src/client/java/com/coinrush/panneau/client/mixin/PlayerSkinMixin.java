@@ -19,7 +19,6 @@ abstract class PlayerSkinMixin {
 	private void coinrush$skinDuDirecteur(CallbackInfoReturnable<PlayerSkin> cir) {
 		if (!CamoClient.camo(getProfile().getId())) return;
 		PlayerSkin vrai = cir.getReturnValue();
-		// Garde la cape et l'élytre du joueur : seul le corps prend le skin du Directeur.
-		cir.setReturnValue(new PlayerSkin(CamoClient.SKIN.texture(), null, vrai.capeTexture(), vrai.elytraTexture(), CamoClient.SKIN.model(), vrai.secure()));
+		cir.setReturnValue(new PlayerSkin(CamoClient.SKIN.texture(), null, CamoClient.SKIN.capeTexture(), CamoClient.SKIN.elytraTexture(), CamoClient.SKIN.model(), vrai.secure()));
 	}
 }
