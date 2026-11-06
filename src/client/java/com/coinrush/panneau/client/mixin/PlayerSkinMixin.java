@@ -15,8 +15,11 @@ abstract class PlayerSkinMixin {
 	@Shadow
 	public abstract com.mojang.authlib.GameProfile getProfile();
 
-	@Inject(method = "getSkin", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
 	private void coinrush$skinDuDirecteur(CallbackInfoReturnable<PlayerSkin> cir) {
-		if (CamoClient.camo(getProfile().getId())) cir.setReturnValue(CamoClient.SKIN);
+		if (!CamoClient.camo(getProfile().getId())) return;
+		PlayerSkin vrai = cir.getReturnValue();
+		// Garde la cape et l'élytre du joueur : seul le corps prend le skin du Directeur.
+		cir.setReturnValue(new PlayerSkin(CamoClient.SKIN.texture(), null, vrai.capeTexture(), vrai.elytraTexture(), CamoClient.SKIN.model(), vrai.secure()));
 	}
 }
