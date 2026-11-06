@@ -62,6 +62,46 @@ final class Chrono {
 		return null;
 	}
 
+	/** Ouverture des bandes noires, de 0 (fermées) à 1 (ouvertes) : chaque événement « bandes » mène à son état en {@code duree} ticks, depuis l'état atteint à sa date. */
+	float bandes(double tick) {
+		float depart = 0, cible = 0;
+		double t0 = 0, duree = 0;
+		for (Evenement e : evenements) {
+			if (!e.type().equals(CinematiquePayload.BANDES)) continue;
+			if (e.t() > tick) break;
+			depart = valeur(depart, cible, t0, duree, e.t());
+			cible = e.actif() ? 1 : 0;
+			t0 = e.t();
+			duree = e.duree();
+		}
+		return valeur(depart, cible, t0, duree, tick);
+	}
+
+	private static float valeur(float depart, float cible, double t0, double duree, double tick) {
+		if (duree <= 0 || tick >= t0 + duree) return cible;
+		return depart + (cible - depart) * (float) ((tick - t0) / duree);
+	}
+
+	/** Une image à l'écran : empreinte du fichier, centre (parts de l'écran), largeur (part de l'écran), opacité. */
+	record Image(String media, float x, float y, float largeur, float alpha) { }
+
+	/** Images visibles, dans l'ordre : la dernière est dessinée par-dessus. */
+	List<Image> images(double tick) {
+		List<Image> l = new ArrayList<>();
+		for (Evenement e : evenements) {
+			if (e.t() > tick) break;
+			if (!e.type().equals(CinematiquePayload.IMAGE)) continue;
+			float a = alpha(e, tick);
+			if (a > 0) l.add(new Image(e.media(), e.x(), e.y(), e.largeur(), a));
+		}
+		return l;
+	}
+
+	/** Sons importés, par date. */
+	List<Evenement> audios() {
+		return evenements.stream().filter(e -> e.type().equals(CinematiquePayload.AUDIO)).toList();
+	}
+
 	/** Courbe d'opacité d'un effet : entrée, maintien, sortie ; 0 avant et après. */
 	static float alpha(Evenement e, double tick) {
 		double ms = tick - e.t();

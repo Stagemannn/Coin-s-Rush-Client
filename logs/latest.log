@@ -1,0 +1,4 @@
+[01:36:57] [Test worker/WARN]: Fichier de cinématique 77829e0a1525fff79b6c6038ffb29f5deb0eb9b9cbe7be1d7c9cb3c2b8a86b27 abandonné : morceau 0 inattendu
+[01:36:57] [Test worker/WARN]: Fichier de cinématique 77829e0a1525fff79b6c6038ffb29f5deb0eb9b9cbe7be1d7c9cb3c2b8a86b27 refusé : empreinte
+[01:36:57] [Test worker/WARN]: Fichier de cinématique edac07af64287dfbf296fecbc2ada5570fb8c52425fcb66238a5d2b965a2b674 refusé : signature
+[01:36:57] [Test worker/WARN]: Fichier de cinématique 38f4589bbb68bcbb48c6d8413c7da2f532423577d3ee7964374b562c1b6d2a84 abandonné : morceau 1 inattendu

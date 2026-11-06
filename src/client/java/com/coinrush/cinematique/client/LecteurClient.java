@@ -1,12 +1,24 @@
 package com.coinrush.cinematique.client;
 
 import com.coinrush.commun.CinematiqueFiniePayload;
+import com.coinrush.commun.CinematiqueMediaMorceauPayload;
+import com.coinrush.commun.CinematiqueMediasDemandePayload;
+import com.coinrush.commun.CinematiqueMediasPayload;
 import com.coinrush.commun.CinematiquePayload;
 import com.coinrush.commun.CinematiquePayload.Pose;
 import com.coinrush.commun.CinematiqueStopPayload;
 import com.coinrush.commun.Commun;
 import com.coinrush.panneau.client.PanneauClient;
+import com.mojang.blaze3d.platform.NativeImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -17,6 +29,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -33,14 +48,20 @@ import org.slf4j.LoggerFactory;
  * Le client ne décide de rien : la validation borne la durée.
  */
 public final class LecteurClient implements ClientModInitializer {
+	/** Côté maximal d'une image importée, en pixels (le serveur borne déjà le poids du fichier). */
+	private static final int MAX_COTE_IMAGE = 2048;
 	private static final Logger LOGGER = LoggerFactory.getLogger("coinrush");
 	private static Lecture current;
+	/** Images et sons importés par les cinématiques, gardés d'une partie à l'autre dans {@code config/coinrush/medias}. */
+	private static final Medias MEDIAS = new Medias(FabricLoader.getInstance().getConfigDir().resolve("coinrush").resolve("medias"));
 
 	@Override
 	public void onInitializeClient() {
 		Commun.init();
 		ClientPlayNetworking.registerGlobalReceiver(CinematiquePayload.TYPE, (payload, context) -> start(payload));
 		ClientPlayNetworking.registerGlobalReceiver(CinematiqueStopPayload.TYPE, (payload, context) -> stop());
+		ClientPlayNetworking.registerGlobalReceiver(CinematiqueMediasPayload.TYPE, (payload, context) -> manifeste(payload));
+		ClientPlayNetworking.registerGlobalReceiver(CinematiqueMediaMorceauPayload.TYPE, (payload, context) -> MEDIAS.morceau(payload));
 		ClientTickEvents.END_CLIENT_TICK.register(c -> {
 			if (current != null) current.tick();
 		});
@@ -54,6 +75,16 @@ public final class LecteurClient implements ClientModInitializer {
 			});
 		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(LecteurClient::stop)); // thread réseau
+	}
+
+	/** Liste des fichiers d'une cinématique : demande au serveur ceux qui manquent (liste vide : tout est déjà là). */
+	private static void manifeste(CinematiqueMediasPayload p) {
+		try {
+			List<String> manquants = MEDIAS.manifeste(p.medias());
+			if (ClientPlayNetworking.canSend(CinematiqueMediasDemandePayload.TYPE)) ClientPlayNetworking.send(new CinematiqueMediasDemandePayload(p.id(), manquants));
+		} catch (IllegalArgumentException e) {
+			LOGGER.warn("Liste de fichiers de cinématique refusée : {}", e.getMessage());
+		}
 	}
 
 	static void start(CinematiquePayload payload) {
@@ -89,11 +120,19 @@ public final class LecteurClient implements ClientModInitializer {
 		private int tick = -1;
 		/** Vrai tant que la caméra est détachée du joueur. */
 		boolean detachee;
+		private final List<CinematiquePayload.Evenement> audios;
+		private int prochainAudio;
+		private final List<SonImporte> sons = new ArrayList<>();
+		/** Textures des images, par empreinte ; null = fichier illisible (signalé une fois). */
+		private final Map<String, Image> images = new HashMap<>();
+
+		private record Image(net.minecraft.resources.ResourceLocation id, int largeur, int hauteur) { }
 
 		Lecture(Minecraft mc, CinematiquePayload data) {
 			this.mc = mc;
 			this.data = data;
 			this.chrono = new Chrono(data);
+			this.audios = chrono.audios();
 			this.previousCamera = mc.getCameraEntity();
 			this.hideGui = mc.options.hideGui;
 			this.cameraType = mc.options.getCameraType();
@@ -111,6 +150,7 @@ public final class LecteurClient implements ClientModInitializer {
 				finish();
 				return;
 			}
+			jouerSons();
 			Pose p = chrono.camera(tick);
 			if (p == null) {
 				if (detachee) detacher();
@@ -126,6 +166,44 @@ public final class LecteurClient implements ClientModInitializer {
 			camera.setPos(p.x(), p.y(), p.z());
 			camera.setYRot(p.yaw());
 			camera.setXRot(p.pitch());
+		}
+
+		/** Lance les sons importés arrivés à leur date, et libère ceux qui ont fini. */
+		private void jouerSons() {
+			sons.removeIf(s -> {
+				boolean fini = s.fini();
+				if (fini) s.arreter();
+				return fini;
+			});
+			while (prochainAudio < audios.size() && audios.get(prochainAudio).t() <= tick) {
+				CinematiquePayload.Evenement e = audios.get(prochainAudio++);
+				try {
+					float gain = e.volume() * mc.options.getSoundSourceVolume(SoundSource.MASTER);
+					sons.add(SonImporte.jouer(MEDIAS.chemin(e.media(), CinematiquePayload.OGG), gain, e.hauteur()));
+				} catch (IOException | RuntimeException x) {
+					LOGGER.warn("Son de cinématique {} ignoré : {}", data.id(), x.toString());
+				}
+			}
+		}
+
+		/** Texture d'une image du cache, créée à la première demande ; null si le fichier manque ou est illisible. */
+		private Image image(String sha) {
+			if (images.containsKey(sha)) return images.get(sha);
+			Image r = null;
+			try (InputStream in = Files.newInputStream(MEDIAS.chemin(sha, CinematiquePayload.PNG))) {
+				NativeImage px = NativeImage.read(in);
+				if (px.getWidth() > MAX_COTE_IMAGE || px.getHeight() > MAX_COTE_IMAGE) {
+					px.close();
+					throw new IOException("image trop grande");
+				}
+				net.minecraft.resources.ResourceLocation id = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("coinrush", "cinematique/" + sha);
+				mc.getTextureManager().register(id, new DynamicTexture(() -> "coinrush cinematique " + sha, px));
+				r = new Image(id, px.getWidth(), px.getHeight());
+			} catch (IOException | RuntimeException x) {
+				LOGGER.warn("Image de cinématique {} ignorée : {}", data.id(), x.toString());
+			}
+			images.put(sha, r);
+			return r;
 		}
 
 		private void attacher(Pose p) {
@@ -153,18 +231,30 @@ public final class LecteurClient implements ClientModInitializer {
 
 		void end(boolean notify) {
 			if (detachee) detacher();
+			sons.forEach(SonImporte::arreter);
+			sons.clear();
+			images.values().stream().filter(i -> i != null).forEach(i -> mc.getTextureManager().release(i.id()));
+			images.clear();
 			if (notify && ClientPlayNetworking.canSend(CinematiqueFiniePayload.TYPE)) ClientPlayNetworking.send(new CinematiqueFiniePayload(data.id()));
 		}
 
 		void draw(GuiGraphics g, int width, int height, float partial) {
 			double t = tick + partial;
-			if (detachee && data.bandesNoires()) {
-				int bar = height / 8;
+			int bar = Math.round(height / 8f * chrono.bandes(t));
+			if (bar > 0) {
 				g.fill(0, 0, width, bar, 0xFF000000);
 				g.fill(0, height - bar, width, height, 0xFF000000);
 			}
 			int noir = (int) (chrono.fondu(t) * 255);
 			if (noir > 0) g.fill(0, 0, width, height, noir << 24);
+			for (Chrono.Image im : chrono.images(t)) {
+				Image tex = image(im.media());
+				int a = (int) (im.alpha() * 255);
+				if (tex == null || a < 4) continue;
+				int w = Math.max(1, Math.round(im.largeur() * width)), hh = Math.max(1, Math.round(w * (float) tex.hauteur() / tex.largeur()));
+				g.blit(RenderPipelines.GUI_TEXTURED, tex.id(), Math.round(im.x() * width - w / 2f), Math.round(im.y() * height - hh / 2f), 0f, 0f, w, hh,
+						tex.largeur(), tex.hauteur(), tex.largeur(), tex.hauteur(), a << 24 | 0xFFFFFF);
+			}
 			Chrono.Texte texte = chrono.texte(t);
 			if (texte == null) return;
 			int alpha = (int) (texte.alpha() * 255);
