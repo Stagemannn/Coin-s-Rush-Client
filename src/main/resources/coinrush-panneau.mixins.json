@@ -1,0 +1,8 @@
+{
+	"required": true,
+	"refmap": "client-CoinRush-Client-refmap.json",
+	"package": "com.coinrush.panneau.client.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": ["PlayerNameMixin"],
+	"injectors": { "defaultRequire": 1 }
+}

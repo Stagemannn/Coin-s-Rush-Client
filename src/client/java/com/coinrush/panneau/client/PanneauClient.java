@@ -1,5 +1,6 @@
 package com.coinrush.panneau.client;
 
+import com.coinrush.commun.ClassementPayload;
 import com.coinrush.commun.Commun;
 import com.coinrush.commun.JourPayload;
 import com.coinrush.commun.LocationPayload;
@@ -48,6 +49,7 @@ public final class PanneauClient implements ClientModInitializer {
 	private static volatile long receivedAt;
 	private static volatile String lieu = "";
 	private static volatile String jour = "";
+	private static volatile int rangSolo, joueurs;
 	private static boolean compact, detailed;
 	/** Rectangle du panneau tel que dessiné à la dernière image (largeur 0 : rien d'affiché), pour le clic. */
 	private static int rx, ry, rw, rh;
@@ -95,8 +97,18 @@ public final class PanneauClient implements ClientModInitializer {
 				LOGGER.warn("Jour refusé : {}", e.getMessage());
 			}
 		});
+		ClientPlayNetworking.registerGlobalReceiver(ClassementPayload.TYPE, (payload, context) -> {
+			try {
+				payload.validate();
+				joueurs = payload.joueurs();
+				rangSolo = payload.place();
+			} catch (IllegalArgumentException e) {
+				LOGGER.warn("Classement refusé : {}", e.getMessage());
+			}
+		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			panel = Panel.EMPTY;
+			rangSolo = 0;
 			lieu = "";
 			jour = "";
 		});
@@ -162,6 +174,12 @@ public final class PanneauClient implements ClientModInitializer {
 		String place = lieu;
 		if (!place.isEmpty()) {
 			Component c = Component.literal("Lieu : ").withStyle(Style.EMPTY.withColor(ORANGE)).append(fmt(place));
+			lines.add(new Line(c.getVisualOrderText(), 0xFFFFFF, "", 0, false, -1, 0, 0));
+		}
+		int rang = rangSolo;
+		if (rang > 0) {
+			Component c = Component.literal("Classement : ").withStyle(Style.EMPTY.withColor(ORANGE))
+					.append(Component.literal(rang + (rang == 1 ? "er" : "e") + " sur " + joueurs).withStyle(Style.EMPTY.withColor(0xFFFFFF)));
 			lines.add(new Line(c.getVisualOrderText(), 0xFFFFFF, "", 0, false, -1, 0, 0));
 		}
 		if (compact) return lines;

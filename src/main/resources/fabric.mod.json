@@ -22,7 +22,8 @@
 	},
 	"mixins": [
 		"coinrush.mixins.json",
-		"coinrush-carte.mixins.json"
+		"coinrush-carte.mixins.json",
+		"coinrush-panneau.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.5",
