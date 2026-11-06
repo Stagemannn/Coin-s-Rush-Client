@@ -23,28 +23,22 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Marker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Lecteur de cinématiques en événements datés (voir {@link CinematiquePayload}) : caméra détachée du joueur qui suit un chemin lissé, bandes
- * noires, fondus au noir et textes, HUD masqué et joueur bloqué par un écran tant que la caméra est détachée. Après un « cameraoff » le joueur
- * reprend la main (le serveur peut encore l'immobiliser) et fondus et textes continuent par-dessus le jeu. Échap ouvre le menu (pas de « passer »).
- * À la fin, retour à la vue normale puis signal {@link CinematiqueFiniePayload} ; le serveur peut aussi arrêter la lecture.
+ * Lecteur de cinématiques en événements datés (voir {@link CinematiquePayload}), comme l'intro de FK : la caméra du jeu est déplacée d'elle-même
+ * sur un chemin lissé (mixin de {@code Camera}) et filme le personnage du joueur, qui reste visible, libre de bouger et d'ouvrir son inventaire ou
+ * son chat. Bandes noires, fondus, textes et images passent par le HUD. Pendant toute la lecture, sans toucher aux options du joueur (ni en mémoire
+ * ni sur disque) : champ de vision « Quake Pro » (110) et échelle de l'interface 2, imposés par des mixins qui cessent avec la lecture. Après un
+ * « cameraoff » la caméra revient au joueur. À la fin, signal {@link CinematiqueFiniePayload} ; le serveur peut aussi arrêter la lecture.
  * Le client ne décide de rien : la validation borne la durée.
  */
 public final class LecteurClient implements ClientModInitializer {
@@ -65,14 +59,9 @@ public final class LecteurClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(c -> {
 			if (current != null) current.tick();
 		});
-		// Caméra rendue au joueur : fondus et textes passent par le HUD ; caméra détachée : par l'écran de lecture (et le menu Échap).
+		// Bandes, fondus, textes et images : par-dessus le jeu (un écran ouvert, comme l'inventaire, passe par-dessus).
 		HudElementRegistry.addLast(ResourceLocation.fromNamespaceAndPath("coinrush", "cinematique"), (g, delta) -> {
-			if (current != null && !current.detachee) current.draw(g, g.guiWidth(), g.guiHeight(), delta.getGameTimeDeltaPartialTick(false));
-		});
-		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-			if (screen instanceof PauseScreen) ScreenEvents.afterRender(screen).register((s, g, mx, my, delta) -> {
-				if (current != null && current.detachee) current.draw(g, s.width, s.height, delta);
-			});
+			if (current != null) current.draw(g, g.guiWidth(), g.guiHeight(), delta.getGameTimeDeltaPartialTick(false));
 		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(LecteurClient::stop)); // thread réseau
 	}
@@ -99,6 +88,20 @@ public final class LecteurClient implements ClientModInitializer {
 		CinematiqueClient.stop(); // l'ancien lecteur (scénario JSON) cède la place
 		stop();
 		current = new Lecture(mc, payload);
+		mc.resizeDisplay(); // échelle de l'interface imposée (voir WindowMixin)
+	}
+
+	/** Une cinématique est en cours : champ de vision et échelle de l'interface sont imposés par les mixins. */
+	public static boolean actif() {
+		return current != null;
+	}
+
+	/** Pose de la caméra de la cinématique à cet instant : {@code {x, y, z, yaw, pitch}}, ou null si la vue est celle du joueur. */
+	public static double[] camera(float partial) {
+		Lecture l = current;
+		if (l == null) return null;
+		Pose p = l.chrono.camera(Math.max(0, l.tick) + partial);
+		return p == null ? null : new double[] {p.x(), p.y(), p.z(), p.yaw(), p.pitch()};
 	}
 
 	/** Arrêt sans signal : ordre du serveur, déconnexion ou remplacement. */
@@ -112,14 +115,8 @@ public final class LecteurClient implements ClientModInitializer {
 		private final Minecraft mc;
 		private final CinematiquePayload data;
 		private final Chrono chrono;
-		private final Entity camera;
-		private final Entity previousCamera;
-		private final boolean hideGui;
-		private final CameraType cameraType;
-		private final Screen screen;
+		private final net.minecraft.client.multiplayer.ClientLevel monde;
 		private int tick = -1;
-		/** Vrai tant que la caméra est détachée du joueur. */
-		boolean detachee;
 		private final List<CinematiquePayload.Evenement> audios;
 		private int prochainAudio;
 		private final List<SonImporte> sons = new ArrayList<>();
@@ -133,16 +130,11 @@ public final class LecteurClient implements ClientModInitializer {
 			this.data = data;
 			this.chrono = new Chrono(data);
 			this.audios = chrono.audios();
-			this.previousCamera = mc.getCameraEntity();
-			this.hideGui = mc.options.hideGui;
-			this.cameraType = mc.options.getCameraType();
-			this.camera = new Marker(EntityType.MARKER, mc.level);
-			screen = new LecteurScreen(this);
-			tick();
+			this.monde = mc.level;
 		}
 
 		void tick() {
-			if (mc.player == null || mc.level != camera.level()) {
+			if (mc.player == null || mc.level != monde) { // mort, autre dimension, déconnexion
 				stop();
 				return;
 			}
@@ -151,21 +143,6 @@ public final class LecteurClient implements ClientModInitializer {
 				return;
 			}
 			jouerSons();
-			Pose p = chrono.camera(tick);
-			if (p == null) {
-				if (detachee) detacher();
-				return;
-			}
-			if (!detachee) attacher(p);
-			else if (mc.screen == null) mc.setScreen(screen); // retour du menu Échap
-			else if (mc.screen != screen && !(mc.screen instanceof PauseScreen)) { // un autre écran a pris la place : on rend la main
-				finish();
-				return;
-			}
-			camera.setOldPosAndRot();
-			camera.setPos(p.x(), p.y(), p.z());
-			camera.setYRot(p.yaw());
-			camera.setXRot(p.pitch());
 		}
 
 		/** Lance les sons importés arrivés à leur date, et libère ceux qui ont fini. */
@@ -206,23 +183,6 @@ public final class LecteurClient implements ClientModInitializer {
 			return r;
 		}
 
-		private void attacher(Pose p) {
-			detachee = true;
-			camera.snapTo(p.x(), p.y(), p.z(), p.yaw(), p.pitch());
-			mc.options.hideGui = true;
-			mc.options.setCameraType(CameraType.FIRST_PERSON);
-			mc.setCameraEntity(camera);
-			mc.setScreen(screen);
-		}
-
-		private void detacher() {
-			detachee = false;
-			mc.options.hideGui = hideGui;
-			mc.options.setCameraType(cameraType);
-			if (mc.getCameraEntity() == camera) mc.setCameraEntity(mc.player != null ? mc.player : previousCamera);
-			if (mc.screen == screen || mc.screen instanceof PauseScreen) mc.setScreen(null);
-		}
-
 		/** Fin normale : vue rendue, puis signal au serveur. */
 		private void finish() {
 			current = null;
@@ -230,11 +190,11 @@ public final class LecteurClient implements ClientModInitializer {
 		}
 
 		void end(boolean notify) {
-			if (detachee) detacher();
 			sons.forEach(SonImporte::arreter);
 			sons.clear();
 			images.values().stream().filter(i -> i != null).forEach(i -> mc.getTextureManager().release(i.id()));
 			images.clear();
+			mc.resizeDisplay(); // échelle de l'interface rendue au joueur : current est déjà null
 			if (notify && ClientPlayNetworking.canSend(CinematiqueFiniePayload.TYPE)) ClientPlayNetworking.send(new CinematiqueFiniePayload(data.id()));
 		}
 
@@ -290,34 +250,6 @@ public final class LecteurClient implements ClientModInitializer {
 				} else if ("klmno".indexOf(c) >= 0 && styles.indexOf(c) < 0) styles += "§" + c;
 			}
 			return couleur + styles;
-		}
-	}
-
-	/** Écran qui capte clavier et souris pendant que la caméra est détachée ; Échap ouvre le menu du jeu. */
-	private static final class LecteurScreen extends Screen {
-		private final Lecture lecture;
-
-		LecteurScreen(Lecture lecture) {
-			super(Component.empty());
-			this.lecture = lecture;
-		}
-
-		@Override
-		public boolean isPauseScreen() {
-			return false;
-		}
-
-		@Override
-		public void onClose() {
-			minecraft.setScreen(new PauseScreen(true));
-		}
-
-		@Override
-		public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) { }
-
-		@Override
-		public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-			lecture.draw(g, width, height, partialTick);
 		}
 	}
 }

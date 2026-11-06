@@ -8,7 +8,9 @@
 		"CameraTypeMixin",
 		"ClientInputAccessor",
 		"EntityTurnMixin",
-		"KeyboardInputMixin"
+		"GameRendererMixin",
+		"KeyboardInputMixin",
+		"WindowMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
