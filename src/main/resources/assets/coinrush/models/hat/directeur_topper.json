@@ -1,0 +1,7 @@
+{
+ "parent": "coinrush:hat/steam_topper",
+ "textures": {
+  "0": "coinrush:block/hat/directeur_topper",
+  "particle": "coinrush:block/hat/directeur_topper"
+ }
+}

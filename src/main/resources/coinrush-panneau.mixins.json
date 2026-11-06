@@ -3,6 +3,6 @@
 	"refmap": "client-CoinRush-Client-refmap.json",
 	"package": "com.coinrush.panneau.client.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"client": ["PlayerNameMixin"],
+	"client": ["PlayerNameMixin", "PlayerSkinMixin"],
 	"injectors": { "defaultRequire": 1 }
 }

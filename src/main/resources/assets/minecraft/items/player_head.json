@@ -165,6 +165,13 @@
         }
       },
       {
+        "when": "cr_hat_directeur_topper",
+        "model": {
+          "type": "minecraft:model",
+          "model": "coinrush:item/hat_directeur_topper"
+        }
+      },
+      {
         "when": "cr_hat_steam_topper",
         "model": {
           "type": "minecraft:model",

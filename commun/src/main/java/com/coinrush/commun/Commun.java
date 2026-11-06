@@ -36,6 +36,7 @@ public final class Commun {
 		PayloadTypeRegistry.playC2S().register(CinematiqueMediasDemandePayload.TYPE, CinematiqueMediasDemandePayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(CinematiqueMediaMorceauPayload.TYPE, CinematiqueMediaMorceauPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(ClassementPayload.TYPE, ClassementPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(CamoPayload.TYPE, CamoPayload.CODEC);
 		Contenu.init();
 		ContenuTemporaire.init();
 	}

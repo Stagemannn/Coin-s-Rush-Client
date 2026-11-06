@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Nom au-dessus de la tête : celui que le serveur donne au joueur dans le tab, s'il en donne un (déguisement de /disguise).
+ * Nom au-dessus de la tête : celui que le serveur donne au joueur dans le tab, s'il en donne un (déguisement de /camo).
  * Sans nom de tab, rendu vanilla. Le profil du joueur (skin, UUID) n'est pas touché.
  */
 @Mixin(Player.class)

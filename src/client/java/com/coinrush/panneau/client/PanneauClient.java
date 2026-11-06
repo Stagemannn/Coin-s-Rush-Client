@@ -97,6 +97,7 @@ public final class PanneauClient implements ClientModInitializer {
 				LOGGER.warn("Jour refusé : {}", e.getMessage());
 			}
 		});
+		CamoClient.init();
 		ClientPlayNetworking.registerGlobalReceiver(ClassementPayload.TYPE, (payload, context) -> {
 			try {
 				payload.validate();
@@ -178,8 +179,8 @@ public final class PanneauClient implements ClientModInitializer {
 		}
 		int rang = rangSolo;
 		if (rang > 0) {
-			Component c = Component.literal("Classement : ").withStyle(Style.EMPTY.withColor(ORANGE))
-					.append(Component.literal(rang + (rang == 1 ? "er" : "e") + " sur " + joueurs).withStyle(Style.EMPTY.withColor(0xFFFFFF)));
+			Component c = Component.literal("Top : ").withStyle(Style.EMPTY.withColor(ORANGE))
+					.append(Component.literal(rang + "/" + joueurs).withStyle(Style.EMPTY.withColor(0xFFFFFF)));
 			lines.add(new Line(c.getVisualOrderText(), 0xFFFFFF, "", 0, false, -1, 0, 0));
 		}
 		if (compact) return lines;

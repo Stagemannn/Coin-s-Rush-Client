@@ -42,7 +42,7 @@ public final class ChapeauxClient implements ClientModInitializer {
 	private static final Set<String> KNOWN = Set.of("aviator", "axolotl_hood", "bloom_crown", "bumblebee", "bunny_beanie", "chef", "corsair", "cozy_pom",
 			"dusty_cowboy", "fiesta", "fox_ears", "frog_bucket", "frost_diadem", "jellyfish", "little_dragon", "midnight_wizard", "miner", "panda_cap",
 			"parcel", "retro_tv", "royal_crown", "rubber_duck", "sea_captain", "steam_topper", "straw_garden", "street_cap", "sushi", "toadstool",
-			"trailblazer", "ufo", "chicken_hat", "diving_helmet", "flight_hat", "military_helmet", "motorcycle_helmet", "pot_hat");
+			"trailblazer", "ufo", "directeur_topper", "chicken_hat", "diving_helmet", "flight_hat", "military_helmet", "motorcycle_helmet", "pot_hat");
 	private static final Map<UUID, String> HATS = new HashMap<>();
 	private static final Map<String, ItemStack> STACKS = new HashMap<>();
 	private static final ItemStackRenderState STATE = new ItemStackRenderState();
