@@ -35,11 +35,13 @@ public final class Contenu {
 
 	private Contenu() { }
 
-	/** Item simple (pile de 64) : nom doré (rouge et épique pour un trophée de boss) et infobulle d'une ligne, tous deux lus dans le fichier de langue. */
+	/** Item simple (pile de 64) : nom doré (rouge pour un trophée de boss) et infobulle d'une ligne, tous deux lus dans le fichier de langue. */
 	private static Item objet(String nom, boolean boss) {
 		Component description = Component.translatable("item.coinrush." + nom + ".desc").withStyle(Style.EMPTY.withColor(ChatFormatting.GRAY).withItalic(false));
-		return Registre.item(nom, p -> new Item(p.rarity(boss ? Rarity.EPIC : Rarity.COMMON)
-				.component(DataComponents.ITEM_NAME, Component.translatable("item.coinrush." + nom).withStyle(boss ? ChatFormatting.RED : ChatFormatting.GOLD))
+		// Couleur sur un enfant : la rareté recolore la racine du nom, pas ses enfants.
+		Component titre = Component.empty().append(Component.translatable("item.coinrush." + nom).withStyle(boss ? ChatFormatting.RED : ChatFormatting.GOLD));
+		return Registre.item(nom, p -> new Item(p.rarity(Rarity.COMMON)
+				.component(DataComponents.ITEM_NAME, titre)
 				.component(DataComponents.LORE, new ItemLore(List.of(description)))));
 	}
 
