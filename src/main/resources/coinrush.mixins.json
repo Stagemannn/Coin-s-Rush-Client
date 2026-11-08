@@ -4,6 +4,7 @@
 	"package": "com.coinrush.cinematique.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"CameraMixin",
 		"GameRendererMixin",
 		"WindowMixin"
 	],
