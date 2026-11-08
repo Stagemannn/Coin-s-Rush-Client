@@ -69,15 +69,12 @@ public final class CameraOptionsScreen extends Screen {
 		addRenderableWidget(new ValueSlider(x2, y, w, 0, 100, 1, CameraOptions.alignTicks,
 				v -> "Durée alignement : " + (int) v + " ticks", v -> CameraOptions.alignTicks = v.intValue()));
 		y += 24;
-		addRenderableWidget(new ValueSlider(x1, y, w, 0, 90, 1, CameraOptions.idleAngle,
-				v -> "Suivi à l'arrêt : " + (int) v + "°", v -> CameraOptions.idleAngle = v.intValue()));
-		addRenderableWidget(toggle(x2, y, w, "Libre en élytres", () -> CameraOptions.elytra, v -> CameraOptions.elytra = v));
+		addRenderableWidget(toggle(x1, y, w, "Libre en élytres", () -> CameraOptions.elytra, v -> CameraOptions.elytra = v));
+		addRenderableWidget(toggle(x2, y, w, "Sans vue de face", () -> CameraOptions.noFront, v -> CameraOptions.noFront = v));
 		y += 24;
-		addRenderableWidget(toggle(x1, y, w, "Sans vue de face", () -> CameraOptions.noFront, v -> CameraOptions.noFront = v));
-		addRenderableWidget(new ValueSlider(x2, y, w, 0, 100, 1, CameraOptions.rotationSpeed,
+		addRenderableWidget(new ValueSlider(x1, y, w, 0, 100, 1, CameraOptions.rotationSpeed,
 				v -> "Rotation perso : " + (int) v, v -> CameraOptions.rotationSpeed = v.intValue()));
-		y += 24;
-		addRenderableWidget(new ValueSlider(x1, y, w, 0, 100, 1, CameraOptions.pitchSpeed,
+		addRenderableWidget(new ValueSlider(x2, y, w, 0, 100, 1, CameraOptions.pitchSpeed,
 				v -> "Inclinaison perso : " + (int) v, v -> CameraOptions.pitchSpeed = v.intValue()));
 		addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> onClose()).bounds(width / 2 - 100, Math.min(height - 28, y + 40), 200, 20).build());
 	}

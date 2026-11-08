@@ -42,13 +42,6 @@ public final class CameraMath {
 		return cameraYaw + (float) Math.toDegrees(Math.atan2(-left, forward));
 	}
 
-	/** Cap visé par un personnage immobile : il ne bouge pas tant que la caméra reste dans {@code limit}, sinon il la suit à cet écart. */
-	public static float idleTarget(float playerYaw, float cameraYaw, float limit) {
-		float diff = wrap(cameraYaw - playerYaw);
-		if (Math.abs(diff) <= limit) return playerYaw;
-		return cameraYaw - Math.signum(diff) * limit;
-	}
-
 	public static float clampPitch(float pitch) {
 		return Math.max(-90f, Math.min(90f, pitch));
 	}

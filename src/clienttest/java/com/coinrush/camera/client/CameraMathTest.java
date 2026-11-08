@@ -51,16 +51,6 @@ class CameraMathTest {
 	}
 
 	@Test
-	void idleFollowsOnlyBeyondTheLimit() {
-		assertEquals(10, CameraMath.idleTarget(10, 40, 45), 1e-4); // dans l'angle : immobile
-		assertEquals(10, CameraMath.idleTarget(10, -30, 45), 1e-4);
-		assertEquals(55, CameraMath.idleTarget(10, 100, 45), 1e-4); // plus loin : suit en gardant 45°
-		assertEquals(-35, CameraMath.idleTarget(10, -80, 45), 1e-4);
-		assertEquals(0, CameraMath.wrap(CameraMath.idleTarget(170, -170, 45) - 170), 1e-4); // 20° à travers ±180 : immobile
-		assertEquals(10, CameraMath.idleTarget(10, 100, 180), 1e-4);
-	}
-
-	@Test
 	void pitchClamp() {
 		assertEquals(90, CameraMath.clampPitch(120));
 		assertEquals(-90, CameraMath.clampPitch(-120));

@@ -17,8 +17,6 @@ public final class CameraOptions {
 	/** Le personnage s'aligne sur la caméra quand on clique (attaque, utilisation), pendant {@link #alignTicks} ticks après le clic. */
 	public static volatile boolean alignOnClick = true;
 	public static volatile int alignTicks = 40;
-	/** Angle (degrés) dans lequel un personnage immobile suit légèrement la caméra. */
-	public static volatile int idleAngle = 45;
 	/** Caméra libre aussi en vol en élytres. */
 	public static volatile boolean elytra;
 	/** La vue de face est retirée du cycle de F5. */
@@ -50,7 +48,6 @@ public final class CameraOptions {
 			enabled = bool(o, "freeCamera", enabled);
 			alignOnClick = bool(o, "alignOnClick", alignOnClick);
 			alignTicks = clamp(o, "alignTicks", 0, 100, alignTicks);
-			idleAngle = clamp(o, "idleAngle", 0, 90, idleAngle);
 			elytra = bool(o, "freeCameraElytra", elytra);
 			noFront = bool(o, "noFrontView", noFront);
 			rotationSpeed = clamp(o, "rotationSpeed", 0, 100, rotationSpeed);
@@ -66,7 +63,6 @@ public final class CameraOptions {
 		o.addProperty("freeCamera", enabled);
 		o.addProperty("alignOnClick", alignOnClick);
 		o.addProperty("alignTicks", alignTicks);
-		o.addProperty("idleAngle", idleAngle);
 		o.addProperty("freeCameraElytra", elytra);
 		o.addProperty("noFrontView", noFront);
 		o.addProperty("rotationSpeed", rotationSpeed);

@@ -83,12 +83,10 @@ public final class FreeCamera {
 		Vec2 move = input.getMoveVector();
 		boolean moving = move.x != 0 || move.y != 0;
 		boolean follow = align > 0 || p.isFallFlying(); // alignement après un clic, ou vol en élytres : le personnage suit la caméra
-		float target;
-		if (follow) target = yaw;
-		else if (moving) target = CameraMath.moveYaw(yaw, move.x, move.y);
-		else target = CameraMath.idleTarget(p.getYRot(), yaw, CameraOptions.idleAngle);
+		if (!follow && !moving) return; // à l'arrêt, le personnage ne bouge pas : seule la caméra tourne (comme Better Third Person)
+		float target = follow ? yaw : CameraMath.moveYaw(yaw, move.x, move.y);
 		p.setYRot(CameraMath.stepToward(p.getYRot(), target, CameraOptions.rotationSpeed));
-		p.setXRot(CameraMath.stepPitch(p.getXRot(), pitch, CameraOptions.pitchSpeed));
+		if (follow) p.setXRot(CameraMath.stepPitch(p.getXRot(), pitch, CameraOptions.pitchSpeed));
 		if (moving && !follow) {
 			// Toute touche de marche devient « avancer » : le personnage va dans la direction où il se tourne (et peut courir dans toutes).
 			Input keys = input.keyPresses;
