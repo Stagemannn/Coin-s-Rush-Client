@@ -15,6 +15,7 @@
 			"com.coinrush.dialogue.client.DialogueClient",
 			"com.coinrush.repere.client.RepereClient",
 			"com.coinrush.chapeaux.client.ChapeauxClient",
+			"com.coinrush.options.client.OptionsClient",
 			"com.coinrush.carte.client.CarteClient",
 			"com.coinrush.temporaire.client.ContenuTemporaireClient"
 		]
