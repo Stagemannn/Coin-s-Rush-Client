@@ -1,15 +1,10 @@
 {
 	"required": true,
 	"refmap": "client-CoinRush-Client-refmap.json",
-	"package": "com.coinrush.camera.client.mixin",
+	"package": "com.coinrush.cinematique.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"CameraMixin",
-		"CameraTypeMixin",
-		"ClientInputAccessor",
-		"EntityTurnMixin",
 		"GameRendererMixin",
-		"KeyboardInputMixin",
 		"WindowMixin"
 	],
 	"injectors": {

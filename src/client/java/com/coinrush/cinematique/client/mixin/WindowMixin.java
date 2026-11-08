@@ -1,4 +1,4 @@
-package com.coinrush.camera.client.mixin;
+package com.coinrush.cinematique.client.mixin;
 
 import com.coinrush.cinematique.client.LecteurClient;
 import com.mojang.blaze3d.platform.Window;
