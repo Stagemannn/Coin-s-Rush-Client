@@ -9,6 +9,9 @@ import com.coinrush.commun.PanelPayload;
 import com.coinrush.commun.Coins;
 import com.coinrush.socle.client.SocleClient;
 import com.mojang.blaze3d.platform.InputConstants;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.ClientModInitializer;
@@ -19,6 +22,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -43,7 +47,8 @@ public final class PanneauClient implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("coinrush");
 	private static final int PAD = 4, GAP = 10, MAX_WIDTH = 190, MAX_WIDTH_DETAIL = 250, CHECK_W = 11;
 	private static final int ORANGE = 0xFFAA00, RED = 0xFF5555, GREEN = 0x55FF55;
-	private static final KeyMapping TOGGLE = new KeyMapping("key.coinrush.panneau", InputConstants.Type.KEYSYM, InputConstants.KEY_K, "key.categories.coinrush");
+	/** Touche réduire / agrandir, réglable dans Commandes ou dans Coin's Rush Options. */
+	public static final KeyMapping TOGGLE = new KeyMapping("key.coinrush.panneau", InputConstants.Type.KEYSYM, InputConstants.KEY_K, "key.categories.coinrush");
 
 	private static volatile Panel panel = Panel.EMPTY;
 	private static volatile long receivedAt;
@@ -51,6 +56,8 @@ public final class PanneauClient implements ClientModInitializer {
 	private static volatile String jour = "";
 	private static volatile int rangSolo, joueurs;
 	private static boolean compact, detailed;
+	/** Mémorise si le panneau est réduit, d'une partie à l'autre. */
+	private static final Path REGLAGE = FabricLoader.getInstance().getConfigDir().resolve("coinrush").resolve("panneau.txt");
 	/** Rectangle du panneau tel que dessiné à la dernière image (largeur 0 : rien d'affiché), pour le clic. */
 	private static int rx, ry, rw, rh;
 
@@ -61,8 +68,9 @@ public final class PanneauClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		Commun.init();
 		KeyBindingHelper.registerKeyBinding(TOGGLE);
+		compact = Files.exists(REGLAGE) && readReglage().equals("reduit");
 		ClientTickEvents.END_CLIENT_TICK.register(c -> {
-			while (TOGGLE.consumeClick()) compact = !compact;
+			while (TOGGLE.consumeClick()) compact(!compact);
 			if (!(c.screen instanceof ChatScreen)) detailed = false;
 		});
 		// Un clic sur le panneau bascule la vue détaillée et n'atteint pas le chat.
@@ -114,6 +122,29 @@ public final class PanneauClient implements ClientModInitializer {
 			jour = "";
 		});
 		HudElementRegistry.addLast(ResourceLocation.fromNamespaceAndPath("coinrush", "panneau"), (graphics, delta) -> render(graphics));
+	}
+
+	public static boolean compact() {
+		return compact;
+	}
+
+	/** Réduit (Coins, lieu, classement) ou complet (avec quêtes et événements) ; enregistré aussitôt. */
+	public static void compact(boolean value) {
+		compact = value;
+		try {
+			Files.createDirectories(REGLAGE.getParent());
+			Files.writeString(REGLAGE, value ? "reduit" : "complet");
+		} catch (IOException e) {
+			LOGGER.warn("Réglage du panneau non enregistré : {}", e.getMessage());
+		}
+	}
+
+	private static String readReglage() {
+		try {
+			return Files.readString(REGLAGE).strip();
+		} catch (IOException e) {
+			return "";
+		}
 	}
 
 	private static int accent(Panel.Kind kind) {
