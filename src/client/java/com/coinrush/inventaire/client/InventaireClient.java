@@ -1,10 +1,12 @@
 package com.coinrush.inventaire.client;
 
-import com.coinrush.carte.client.CarteClient;
-import com.coinrush.carte.client.ProfilBox;
-import com.coinrush.carte.client.mixin.ContainerScreenAccessor;
+import com.coinrush.commun.CartePayload;
+import com.coinrush.commun.Commun;
+import com.coinrush.inventaire.client.mixin.ContainerScreenAccessor;
 import java.util.List;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -14,38 +16,57 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Inventaire, en survie comme en créatif, à gauche de celui-ci : une ligne de trois boutons « Agenda », « Quêtes » et « Map »,
- * exactement de la largeur du profil, juste au-dessus de lui. Le livre de recettes décale l'inventaire : on suit sa position à chaque
- * image, et s'il est ouvert tout passe dans le coin de l'écran pour ne pas le recouvrir.
+ * Inventaire, en survie comme en créatif, à gauche de celui-ci : une ligne de deux boutons « Agenda » et « Quêtes », exactement
+ * de la largeur du profil, juste au-dessus de lui. Le livre de recettes décale l'inventaire : on suit sa position à chaque
+ * image, et s'il est ouvert tout passe dans le coin de l'écran pour ne pas le recouvrir. Le profil se lit sur le panel joueurs,
+ * dont l'adresse arrive du serveur à la connexion ({@link CartePayload}) ; sans elle, le profil n'est pas affiché.
  */
 public final class InventaireClient implements ClientModInitializer {
+	private static final Logger LOGGER = LoggerFactory.getLogger("coinrush");
 	private static final int H = 16, GAP = 2, HAUT = 8;
+
+	private static volatile String url;
 
 	@Override
 	public void onInitializeClient() {
+		Commun.init();
+		ClientPlayNetworking.registerGlobalReceiver(CartePayload.TYPE, (payload, ctx) -> {
+			try {
+				payload.validate();
+				url = payload.url().isEmpty() ? null : payload.url();
+			} catch (IllegalArgumentException e) {
+				LOGGER.warn("Adresse du panel refusée : {}", e.getMessage());
+				url = null;
+			}
+			ProfilClient.configurer(url);
+		});
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			url = null;
+			ProfilClient.configurer(null);
+		});
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
 			if (!(screen instanceof InventoryScreen) && !(screen instanceof CreativeModeInventoryScreen)) return;
 			ContainerScreenAccessor a = (ContainerScreenAccessor) screen;
-			Button map = Button.builder(Component.literal("Map"), b -> CarteClient.ouvrir(screen)).bounds(0, 0, 40, H).build();
 			ProfilBox profil = new ProfilBox();
-			List<Button> boutons = List.of(commande("Agenda", "agenda"), commande("Quêtes", "quests"), map);
+			List<Button> boutons = List.of(commande("Agenda", "agenda"), commande("Quêtes", "quests"));
 			boutons.forEach(Screens.getButtons(screen)::add);
 			ScreenEvents.beforeRender(screen).register((s, g, mx, my, delta) -> {
-				map.active = CarteClient.disponible(); // pas de panel joueurs sur ce serveur : bouton grisé
 				int x = gauche(a, s, ProfilBox.largeur(client.font)), w = ProfilBox.largeur(client.font), y = ligneBoutons(a, s);
-				int bw = (w - 2 * GAP) / 3;
+				int bw = (w - GAP) / 2;
 				for (int i = 0; i < boutons.size(); i++) {
 					Button b = boutons.get(i);
 					b.setPosition(x + i * (bw + GAP), y);
-					b.setWidth(i == 2 ? w - 2 * (bw + GAP) : bw); // le dernier prend le reste : la ligne fait pile la largeur du profil
+					b.setWidth(i == 1 ? w - (bw + GAP) : bw); // le dernier prend le reste : la ligne fait pile la largeur du profil
 				}
 			});
 			ScreenEvents.afterRender(screen).register((s, g, mx, my, delta) -> {
-				if (CarteClient.disponible()) profil.render(g, client.font, gauche(a, s, ProfilBox.largeur(client.font)), ligneBoutons(a, s) + H + GAP, false);
+				if (url != null) profil.render(g, client.font, gauche(a, s, ProfilBox.largeur(client.font)), ligneBoutons(a, s) + H + GAP);
 			});
-			ScreenMouseEvents.allowMouseClick(screen).register((s, mx, my, bouton) -> !(CarteClient.disponible() && profil.clic(mx, my, bouton)));
+			ScreenMouseEvents.allowMouseClick(screen).register((s, mx, my, bouton) -> !(url != null && profil.clic(mx, my, bouton)));
 		});
 	}
 

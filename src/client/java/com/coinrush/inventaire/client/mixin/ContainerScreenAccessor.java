@@ -1,10 +1,10 @@
-package com.coinrush.carte.client.mixin;
+package com.coinrush.inventaire.client.mixin;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-/** Position de l'écran d'inventaire, pour placer le bouton Map à sa droite. */
+/** Position de l'écran d'inventaire, pour placer les boutons et le profil à sa gauche. */
 @Mixin(AbstractContainerScreen.class)
 public interface ContainerScreenAccessor {
 	@Accessor("leftPos")

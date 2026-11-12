@@ -1,4 +1,4 @@
-package com.coinrush.carte.client;
+package com.coinrush.inventaire.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -7,7 +7,7 @@ import net.minecraft.client.gui.components.PlayerFaceRenderer;
 
 /**
  * Encadré du profil : tête (avec la couche supérieure du skin), pseudo et Coins ; un clic déplie les stats (blocs posés et cassés,
- * mobs, morts, joueurs et boss tués, quêtes terminées). Utilisé par la carte (en haut à gauche) et par l'inventaire.
+ * mobs, morts, joueurs et boss tués, quêtes terminées). Affiché à gauche de l'inventaire.
  */
 public final class ProfilBox {
 	private static final int ORANGE = 0xFFFFAA00, BLANC = 0xFFFFFFFF, GRIS = 0xFFB49A8E;
@@ -17,7 +17,7 @@ public final class ProfilBox {
 	private boolean ouvert;
 	private int x, y, w, h; // cadre tel que dessiné à la dernière image, pour le clic
 
-	/** Largeur minimale : assez pour les trois boutons de l'inventaire placés au-dessus. */
+	/** Largeur minimale : assez pour les deux boutons de l'inventaire placés au-dessus. */
 	public static final int LARGEUR_MIN = 152;
 
 	private static String pseudo(ProfilClient.Profil p) {
@@ -35,14 +35,14 @@ public final class ProfilBox {
 		return Math.max(LARGEUR_MIN, 30 + Math.max(font.width(pseudo(p)), font.width(coins(p))) + 8);
 	}
 
-	/** @param ancre bord gauche, ou bord droit si {@code aDroite} */
-	public void render(GuiGraphics g, Font font, int ancre, int top, boolean aDroite) {
+	/** @param ancre bord gauche de l'encadré */
+	public void render(GuiGraphics g, Font font, int ancre, int top) {
 		Minecraft mc = Minecraft.getInstance();
 		ProfilClient.Profil p = ProfilClient.actuel();
 		String pseudo = pseudo(p), coins = coins(p);
 		w = largeur(font);
 		h = 26 + (ouvert ? 6 + 10 * STATS.length : 0);
-		x = aDroite ? ancre - w : ancre;
+		x = ancre;
 		y = top;
 		g.fill(x, y, x + w, y + h, 0xE62A1C18);
 		g.renderOutline(x, y, w, h, 0xFF4A2F27);

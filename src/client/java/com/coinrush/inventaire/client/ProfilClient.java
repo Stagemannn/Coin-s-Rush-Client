@@ -1,4 +1,4 @@
-package com.coinrush.carte.client;
+package com.coinrush.inventaire.client;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Profil du joueur (pseudo, Coins, stats) lu sur le panel joueurs. Pas de fil permanent : {@link #actuel()}, appelé à chaque image
- * par la carte ou l'inventaire, relance une lecture en arrière-plan quand la dernière a plus de 3 secondes.
+ * par l'inventaire, relance une lecture en arrière-plan quand la dernière a plus de 3 secondes.
  */
 public final class ProfilClient {
 	public record Profil(String pseudo, String coins, Map<String, Long> stats) { }

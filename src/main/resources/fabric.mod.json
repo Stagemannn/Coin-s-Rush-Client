@@ -16,13 +16,12 @@
 			"com.coinrush.repere.client.RepereClient",
 			"com.coinrush.chapeaux.client.ChapeauxClient",
 			"com.coinrush.options.client.OptionsClient",
-			"com.coinrush.carte.client.CarteClient",
 			"com.coinrush.temporaire.client.ContenuTemporaireClient"
 		]
 	},
 	"mixins": [
 		"coinrush.mixins.json",
-		"coinrush-carte.mixins.json",
+		"coinrush-inventaire.mixins.json",
 		"coinrush-panneau.mixins.json"
 	],
 	"depends": {
